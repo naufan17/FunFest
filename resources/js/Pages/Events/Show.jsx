@@ -4,7 +4,7 @@ import { Head, Link, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 
 export default function Show({ auth, event, isOwner, isRegistered, registration }) {
-    const isAdmin = auth.user.role === 'admin';
+    const isAdmin = auth.user?.role === 'admin';
     const [activeTab, setActiveTab] = useState('info'); // 'info', 'participants', 'leaderboard'
 
     const { post: joinEvent, processing: joining } = useForm({ gender: '' });
@@ -212,7 +212,13 @@ export default function Show({ auth, event, isOwner, isRegistered, registration 
                                         {event.categories.map(cat => (
                                             <button
                                                 key={cat.id}
-                                                onClick={() => handleJoin(cat.gender)}
+                                                onClick={() => {
+                                                    if (!auth.user) {
+                                                        window.location.href = route('login');
+                                                    } else {
+                                                        handleJoin(cat.gender);
+                                                    }
+                                                }}
                                                 disabled={joining}
                                                 className="w-full rounded-2xl bg-white px-6 py-4 text-center font-black uppercase tracking-widest text-[#0A1D37] transition-all hover:bg-[#FF5722] hover:text-white"
                                             >

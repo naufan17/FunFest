@@ -10,7 +10,7 @@ export default function Index({ auth, events }) {
                         <h2 className="text-3xl font-black italic tracking-tight text-[#0A1D37]">ALL EVENTS</h2>
                         <p className="text-gray-500 mt-1">Discover your next challenge</p>
                     </div>
-                    {auth.user.role !== 'participant' && (
+                    {auth.user && auth.user.role !== 'participant' && (
                         <Link
                             href={route('events.create')}
                             className="rounded-full bg-[#FF5722] px-8 py-3 text-sm font-black uppercase tracking-widest text-white shadow-xl shadow-orange-500/20 hover:scale-105 transition-all"

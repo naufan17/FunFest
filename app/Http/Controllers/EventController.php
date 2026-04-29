@@ -64,11 +64,13 @@ class EventController extends Controller
     {
         $event->load(['creator', 'categories', 'registrations.user']);
         
+        $userId = auth()->id();
+        
         return Inertia::render('Events/Show', [
             'event' => $event,
-            'isOwner' => $event->created_by === auth()->id(),
-            'isRegistered' => $event->registrations()->where('user_id', auth()->id())->exists(),
-            'registration' => $event->registrations()->where('user_id', auth()->id())->first(),
+            'isOwner' => $userId ? $event->created_by === $userId : false,
+            'isRegistered' => $userId ? $event->registrations()->where('user_id', $userId)->exists() : false,
+            'registration' => $userId ? $event->registrations()->where('user_id', $userId)->first() : null,
         ]);
     }
 

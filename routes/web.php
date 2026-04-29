@@ -15,14 +15,21 @@ Route::get('/', function () {
         'canRegister' => Route::has('register'),
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
+        'upcomingEvents' => \App\Models\Event::where('date', '>=', now())
+            ->orderBy('date', 'asc')
+            ->take(5)
+            ->get(),
     ]);
 });
+
+    // Public Event Routes
+    Route::resource('events', EventController::class)->only(['index', 'show']);
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Events
-    Route::resource('events', EventController::class);
+    // Protected Event Routes
+    Route::resource('events', EventController::class)->except(['index', 'show']);
     
     // Registrations
     Route::post('/events/{event}/join', [RegistrationController::class, 'store'])->name('events.join');

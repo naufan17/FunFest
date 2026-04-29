@@ -18,7 +18,7 @@ const Logo = ({ className = "h-8" }) => (
     </div>
 );
 
-export default function Welcome({ auth }) {
+export default function Welcome({ auth, upcomingEvents }) {
     return (
         <>
             <Head title="RunFest - Join the Race, Feel the Fest" />
@@ -84,15 +84,67 @@ export default function Welcome({ auth }) {
                             >
                                 Get Started
                             </Link>
-                            <a
-                                href="#features"
+                            <Link
+                                href={route('events.index')}
                                 className="w-full rounded-full border-2 border-white px-10 py-4 text-lg font-black uppercase tracking-wide text-white transition-all hover:bg-white hover:text-[#0A1D37] sm:w-auto"
                             >
                                 View Events
-                            </a>
+                            </Link>
                         </div>
                     </div>
                 </section>
+
+                {/* Upcoming Events Slideshow */}
+                {upcomingEvents && upcomingEvents.length > 0 && (
+                    <section className="bg-white py-16">
+                        <div className="mx-auto max-w-7xl px-6">
+                            <div className="mb-8 flex items-end justify-between">
+                                <div>
+                                    <h2 className="text-3xl font-black italic text-[#0A1D37]">UPCOMING RACES</h2>
+                                    <p className="text-gray-500 mt-1 font-medium">Don't miss out on these events</p>
+                                </div>
+                                <Link href={route('events.index')} className="text-sm font-bold text-[#FF5722] hover:underline">
+                                    View All →
+                                </Link>
+                            </div>
+                            
+                            <div className="flex snap-x snap-mandatory gap-6 overflow-x-auto pb-8 hide-scrollbar">
+                                {upcomingEvents.map(event => (
+                                    <div key={event.id} className="min-w-[300px] md:min-w-[400px] snap-center shrink-0 rounded-[2rem] border border-gray-100 bg-white shadow-lg overflow-hidden transition-all hover:shadow-xl group">
+                                        <div className="bg-[#0A1D37] p-6 text-white relative overflow-hidden">
+                                            <div className="absolute top-0 right-0 w-32 h-32 bg-[#FF5722] opacity-20 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 group-hover:opacity-40 transition-opacity"></div>
+                                            <div className="mb-4 inline-block rounded-full bg-white/20 backdrop-blur-sm px-3 py-1 text-[10px] font-black uppercase tracking-widest">
+                                                {event.distance}
+                                            </div>
+                                            <h3 className="text-2xl font-black italic tracking-tight truncate">{event.title}</h3>
+                                            <p className="mt-2 text-sm text-gray-300 flex items-center gap-2">
+                                                <span>📍</span> {event.location}
+                                            </p>
+                                        </div>
+                                        <div className="p-6">
+                                            <div className="flex justify-between items-center mb-6">
+                                                <div>
+                                                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Date</p>
+                                                    <p className="font-bold text-[#0A1D37]">{new Date(event.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+                                                </div>
+                                                <div className="text-right">
+                                                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Start Time</p>
+                                                    <p className="font-bold text-[#0A1D37]">{event.race_start_time.slice(0, 5)}</p>
+                                                </div>
+                                            </div>
+                                            <Link 
+                                                href={route('events.show', event.id)} 
+                                                className="block w-full rounded-xl bg-gray-50 py-3 text-center text-sm font-black uppercase tracking-widest text-[#0A1D37] transition-colors group-hover:bg-[#FF5722] group-hover:text-white"
+                                            >
+                                                View Details
+                                            </Link>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+                )}
 
                 {/* Features Section */}
                 <section id="features" className="bg-gray-50 py-24">

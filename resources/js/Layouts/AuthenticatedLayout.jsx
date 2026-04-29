@@ -36,7 +36,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                 >
                                     Events
                                 </NavLink>
-                                {user.role === 'admin' && (
+                                {user?.role === 'admin' && (
                                     <NavLink
                                         href={route('admin.users.index')}
                                         active={route().current('admin.users.*')}
@@ -49,38 +49,45 @@ export default function AuthenticatedLayout({ header, children }) {
                         </div>
 
                         <div className="hidden sm:ms-6 sm:flex sm:items-center">
-                            <div className="relative ms-3">
-                                <Dropdown>
-                                    <Dropdown.Trigger>
-                                        <span className="inline-flex rounded-md">
-                                            <button
-                                                type="button"
-                                                className="inline-flex items-center rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-bold text-[#0A1D37] transition duration-150 ease-in-out hover:border-[#FF5722] focus:outline-none"
-                                            >
-                                                {user.name}
-                                                <span className="ml-2 inline-block px-2 py-0.5 text-[10px] bg-gray-100 rounded text-gray-500 uppercase">{user.role}</span>
-                                                <svg
-                                                    className="-me-0.5 ms-2 h-4 w-4"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    viewBox="0 0 20 20"
-                                                    fill="currentColor"
+                            {user ? (
+                                <div className="relative ms-3">
+                                    <Dropdown>
+                                        <Dropdown.Trigger>
+                                            <span className="inline-flex rounded-md">
+                                                <button
+                                                    type="button"
+                                                    className="inline-flex items-center rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-bold text-[#0A1D37] transition duration-150 ease-in-out hover:border-[#FF5722] focus:outline-none"
                                                 >
-                                                    <path
-                                                        fillRule="evenodd"
-                                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                                        clipRule="evenodd"
-                                                    />
-                                                </svg>
-                                            </button>
-                                        </span>
-                                    </Dropdown.Trigger>
+                                                    {user.name}
+                                                    <span className="ml-2 inline-block px-2 py-0.5 text-[10px] bg-gray-100 rounded text-gray-500 uppercase">{user.role}</span>
+                                                    <svg
+                                                        className="-me-0.5 ms-2 h-4 w-4"
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        viewBox="0 0 20 20"
+                                                        fill="currentColor"
+                                                    >
+                                                        <path
+                                                            fillRule="evenodd"
+                                                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                                            clipRule="evenodd"
+                                                        />
+                                                    </svg>
+                                                </button>
+                                            </span>
+                                        </Dropdown.Trigger>
 
-                                    <Dropdown.Content>
-                                        <Dropdown.Link href={route('profile.edit')}>Profile</Dropdown.Link>
-                                        <Dropdown.Link href={route('logout')} method="post" as="button">Log Out</Dropdown.Link>
-                                    </Dropdown.Content>
-                                </Dropdown>
-                            </div>
+                                        <Dropdown.Content>
+                                            <Dropdown.Link href={route('profile.edit')}>Profile</Dropdown.Link>
+                                            <Dropdown.Link href={route('logout')} method="post" as="button">Log Out</Dropdown.Link>
+                                        </Dropdown.Content>
+                                    </Dropdown>
+                                </div>
+                            ) : (
+                                <div className="flex items-center gap-4">
+                                    <Link href={route('login')} className="text-sm font-bold hover:text-[#FF5722]">Log in</Link>
+                                    <Link href={route('register')} className="rounded-full bg-[#FF5722] px-6 py-2 text-sm font-bold text-white transition-all hover:bg-[#e64a19] shadow-lg shadow-orange-200">Sign Up</Link>
+                                </div>
+                            )}
                         </div>
 
                         <div className="-me-2 flex items-center sm:hidden">
@@ -99,22 +106,31 @@ export default function AuthenticatedLayout({ header, children }) {
 
                 <div className={(showingNavigationDropdown ? 'block' : 'hidden') + ' sm:hidden'}>
                     <div className="space-y-1 pb-3 pt-2">
-                        <ResponsiveNavLink href={route('dashboard')} active={route().current('dashboard')}>Dashboard</ResponsiveNavLink>
+                        {user && <ResponsiveNavLink href={route('dashboard')} active={route().current('dashboard')}>Dashboard</ResponsiveNavLink>}
                         <ResponsiveNavLink href={route('events.index')} active={route().current('events.*')}>Events</ResponsiveNavLink>
-                        {user.role === 'admin' && (
+                        {user?.role === 'admin' && (
                             <ResponsiveNavLink href={route('admin.users.index')} active={route().current('admin.users.*')}>Admin: Users</ResponsiveNavLink>
                         )}
                     </div>
-                    <div className="border-t border-gray-200 pb-1 pt-4">
-                        <div className="px-4">
-                            <div className="text-base font-bold text-[#0A1D37]">{user.name}</div>
-                            <div className="text-sm font-medium text-gray-500">{user.email}</div>
+                    {user ? (
+                        <div className="border-t border-gray-200 pb-1 pt-4">
+                            <div className="px-4">
+                                <div className="text-base font-bold text-[#0A1D37]">{user.name}</div>
+                                <div className="text-sm font-medium text-gray-500">{user.email}</div>
+                            </div>
+                            <div className="mt-3 space-y-1">
+                                <ResponsiveNavLink href={route('profile.edit')}>Profile</ResponsiveNavLink>
+                                <ResponsiveNavLink method="post" href={route('logout')} as="button">Log Out</ResponsiveNavLink>
+                            </div>
                         </div>
-                        <div className="mt-3 space-y-1">
-                            <ResponsiveNavLink href={route('profile.edit')}>Profile</ResponsiveNavLink>
-                            <ResponsiveNavLink method="post" href={route('logout')} as="button">Log Out</ResponsiveNavLink>
+                    ) : (
+                        <div className="border-t border-gray-200 pb-1 pt-4">
+                            <div className="mt-3 space-y-1">
+                                <ResponsiveNavLink href={route('login')}>Log in</ResponsiveNavLink>
+                                <ResponsiveNavLink href={route('register')}>Sign Up</ResponsiveNavLink>
+                            </div>
                         </div>
-                    </div>
+                    )}
                 </div>
             </nav>
 
