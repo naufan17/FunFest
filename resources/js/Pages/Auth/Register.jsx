@@ -3,21 +3,54 @@ import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { useState } from 'react';
+
+const schema = z.object({
+    name: z.string().min(2, 'Name must be at least 2 characters'),
+    email: z.string().email('Invalid email address'),
+    password: z.string().min(8, 'Password must be at least 8 characters'),
+    password_confirmation: z.string(),
+    role: z.enum(['participant', 'organizer'], { errorMap: () => ({ message: 'Please select a role' }) }),
+}).refine((data) => data.password === data.password_confirmation, {
+    message: "Passwords don't match",
+    path: ["password_confirmation"],
+});
 
 export default function Register() {
-    const { data, setData, post, processing, errors, reset } = useForm({
-        name: '',
-        email: '',
-        password: '',
-        password_confirmation: '',
+    const [processing, setProcessing] = useState(false);
+    const [backendErrors, setBackendErrors] = useState({});
+
+    const {
+        register,
+        handleSubmit,
+        setValue,
+        watch,
+        formState: { errors },
+    } = useForm({
+        resolver: zodResolver(schema),
+        defaultValues: {
+            name: '',
+            email: '',
+            password: '',
+            password_confirmation: '',
+            role: 'participant',
+        }
     });
 
-    const submit = (e) => {
-        e.preventDefault();
+    const selectedRole = watch('role');
 
-        post(route('register'), {
-            onFinish: () => reset('password', 'password_confirmation'),
+    const onSubmit = (data) => {
+        setProcessing(true);
+        router.post(route('register'), data, {
+            onFinish: () => setProcessing(false),
+            onError: (err) => {
+                setProcessing(false);
+                setBackendErrors(err);
+            },
         });
     };
 
@@ -30,56 +63,40 @@ export default function Register() {
                 <p className="text-gray-500">Create your runner profile today</p>
             </div>
 
-            <form onSubmit={submit}>
+            <form onSubmit={handleSubmit(onSubmit)}>
                 <div>
                     <InputLabel htmlFor="name" value="Name" />
-
                     <TextInput
                         id="name"
-                        name="name"
-                        value={data.name}
                         className="mt-1 block w-full"
                         autoComplete="name"
-                        isFocused={true}
-                        onChange={(e) => setData('name', e.target.value)}
-                        required
+                        {...register('name')}
                     />
-
-                    <InputError message={errors.name} className="mt-2" />
+                    <InputError message={errors.name?.message || backendErrors.name} className="mt-2" />
                 </div>
 
                 <div className="mt-4">
                     <InputLabel htmlFor="email" value="Email" />
-
                     <TextInput
                         id="email"
                         type="email"
-                        name="email"
-                        value={data.email}
                         className="mt-1 block w-full"
                         autoComplete="username"
-                        onChange={(e) => setData('email', e.target.value)}
-                        required
+                        {...register('email')}
                     />
-
-                    <InputError message={errors.email} className="mt-2" />
+                    <InputError message={errors.email?.message || backendErrors.email} className="mt-2" />
                 </div>
 
                 <div className="mt-4">
                     <InputLabel htmlFor="password" value="Password" />
-
                     <TextInput
                         id="password"
                         type="password"
-                        name="password"
-                        value={data.password}
                         className="mt-1 block w-full"
                         autoComplete="new-password"
-                        onChange={(e) => setData('password', e.target.value)}
-                        required
+                        {...register('password')}
                     />
-
-                    <InputError message={errors.password} className="mt-2" />
+                    <InputError message={errors.password?.message || backendErrors.password} className="mt-2" />
                 </div>
 
                 <div className="mt-4">
@@ -87,22 +104,15 @@ export default function Register() {
                         htmlFor="password_confirmation"
                         value="Confirm Password"
                     />
-
                     <TextInput
                         id="password_confirmation"
                         type="password"
-                        name="password_confirmation"
-                        value={data.password_confirmation}
                         className="mt-1 block w-full"
                         autoComplete="new-password"
-                        onChange={(e) =>
-                            setData('password_confirmation', e.target.value)
-                        }
-                        required
+                        {...register('password_confirmation')}
                     />
-
                     <InputError
-                        message={errors.password_confirmation}
+                        message={errors.password_confirmation?.message || backendErrors.password_confirmation}
                         className="mt-2"
                     />
                 </div>
@@ -117,21 +127,21 @@ export default function Register() {
                             <button
                                 key={r.id}
                                 type="button"
-                                onClick={() => setData('role', r.id)}
+                                onClick={() => setValue('role', r.id, { shouldValidate: true })}
                                 className={`rounded-2xl border-2 p-4 text-left transition-all ${
-                                    data.role === r.id 
+                                    selectedRole === r.id 
                                     ? 'border-[#FF5722] bg-orange-50' 
                                     : 'border-gray-100 bg-white hover:border-gray-200'
                                 }`}
                             >
-                                <p className={`font-black italic uppercase tracking-wider text-xs ${data.role === r.id ? 'text-[#FF5722]' : 'text-gray-400'}`}>
+                                <p className={`font-black italic uppercase tracking-wider text-xs ${selectedRole === r.id ? 'text-[#FF5722]' : 'text-gray-400'}`}>
                                     {r.label}
                                 </p>
                                 <p className="text-[10px] text-gray-500 mt-1">{r.desc}</p>
                             </button>
                         ))}
                     </div>
-                    <InputError message={errors.role} className="mt-2" />
+                    <InputError message={errors.role?.message || backendErrors.role} className="mt-2" />
                 </div>
 
                 <div className="mt-10 flex flex-col gap-4">

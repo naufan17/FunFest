@@ -6,10 +6,6 @@ export default forwardRef(function TextInput(
 ) {
     const localRef = useRef(null);
 
-    useImperativeHandle(ref, () => ({
-        focus: () => localRef.current?.focus(),
-    }));
-
     useEffect(() => {
         if (isFocused) {
             localRef.current?.focus();
@@ -24,7 +20,14 @@ export default forwardRef(function TextInput(
                 'rounded-xl border-gray-200 shadow-sm focus:border-[#FF5722] focus:ring-[#FF5722] p-3 ' +
                 className
             }
-            ref={localRef}
+            ref={(element) => {
+                localRef.current = element;
+                if (typeof ref === 'function') {
+                    ref(element);
+                } else if (ref) {
+                    ref.current = element;
+                }
+            }}
         />
     );
 });

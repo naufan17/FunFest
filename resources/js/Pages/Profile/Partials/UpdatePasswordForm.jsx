@@ -3,43 +3,53 @@ import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import { Transition } from '@headlessui/react';
-import { useForm } from '@inertiajs/react';
-import { useRef } from 'react';
+import { router } from '@inertiajs/react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { useState } from 'react';
+
+const schema = z.object({
+    current_password: z.string().min(1, 'Current password is required'),
+    password: z.string().min(8, 'Password must be at least 8 characters'),
+    password_confirmation: z.string()
+}).refine((data) => data.password === data.password_confirmation, {
+    message: "Passwords don't match",
+    path: ["password_confirmation"],
+});
 
 export default function UpdatePasswordForm({ className = '' }) {
-    const passwordInput = useRef();
-    const currentPasswordInput = useRef();
+    const [processing, setProcessing] = useState(false);
+    const [recentlySuccessful, setRecentlySuccessful] = useState(false);
+    const [backendErrors, setBackendErrors] = useState({});
 
     const {
-        data,
-        setData,
-        errors,
-        put,
+        register,
+        handleSubmit,
         reset,
-        processing,
-        recentlySuccessful,
+        formState: { errors },
     } = useForm({
-        current_password: '',
-        password: '',
-        password_confirmation: '',
+        resolver: zodResolver(schema),
+        defaultValues: {
+            current_password: '',
+            password: '',
+            password_confirmation: '',
+        }
     });
 
-    const updatePassword = (e) => {
-        e.preventDefault();
-
-        put(route('password.update'), {
+    const onSubmit = (data) => {
+        setProcessing(true);
+        router.put(route('password.update'), data, {
             preserveScroll: true,
-            onSuccess: () => reset(),
-            onError: (errors) => {
-                if (errors.password) {
-                    reset('password', 'password_confirmation');
-                    passwordInput.current.focus();
-                }
-
-                if (errors.current_password) {
-                    reset('current_password');
-                    currentPasswordInput.current.focus();
-                }
+            onSuccess: () => {
+                setProcessing(false);
+                setRecentlySuccessful(true);
+                reset();
+                setTimeout(() => setRecentlySuccessful(false), 2000);
+            },
+            onError: (err) => {
+                setProcessing(false);
+                setBackendErrors(err);
             },
         });
     };
@@ -55,7 +65,7 @@ export default function UpdatePasswordForm({ className = '' }) {
                 </p>
             </header>
 
-            <form onSubmit={updatePassword} className="mt-6 space-y-8 max-w-2xl">
+            <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-8 max-w-2xl">
                 <div>
                     <InputLabel
                         htmlFor="current_password"
@@ -64,14 +74,11 @@ export default function UpdatePasswordForm({ className = '' }) {
                     />
                     <TextInput
                         id="current_password"
-                        ref={currentPasswordInput}
-                        value={data.current_password}
-                        onChange={(e) => setData('current_password', e.target.value)}
                         type="password"
                         className="mt-2 block w-full"
-                        autoComplete="current-password"
+                        {...register('current_password')}
                     />
-                    <InputError message={errors.current_password} className="mt-2" />
+                    <InputError message={errors.current_password?.message || backendErrors.current_password} className="mt-2" />
                 </div>
 
                 <div className="grid gap-8 md:grid-cols-2">
@@ -83,14 +90,11 @@ export default function UpdatePasswordForm({ className = '' }) {
                         />
                         <TextInput
                             id="password"
-                            ref={passwordInput}
-                            value={data.password}
-                            onChange={(e) => setData('password', e.target.value)}
                             type="password"
                             className="mt-2 block w-full"
-                            autoComplete="new-password"
+                            {...register('password')}
                         />
-                        <InputError message={errors.password} className="mt-2" />
+                        <InputError message={errors.password?.message || backendErrors.password} className="mt-2" />
                     </div>
 
                     <div>
@@ -101,13 +105,11 @@ export default function UpdatePasswordForm({ className = '' }) {
                         />
                         <TextInput
                             id="password_confirmation"
-                            value={data.password_confirmation}
-                            onChange={(e) => setData('password_confirmation', e.target.value)}
                             type="password"
                             className="mt-2 block w-full"
-                            autoComplete="new-password"
+                            {...register('password_confirmation')}
                         />
-                        <InputError message={errors.password_confirmation} className="mt-2" />
+                        <InputError message={errors.password_confirmation?.message || backendErrors.password_confirmation} className="mt-2" />
                     </div>
                 </div>
 

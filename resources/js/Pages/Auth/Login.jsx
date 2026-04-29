@@ -4,20 +4,43 @@ import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { useState } from 'react';
+
+const schema = z.object({
+    email: z.string().email('Invalid email address'),
+    password: z.string().min(1, 'Password is required'),
+    remember: z.boolean().optional(),
+});
 
 export default function Login({ status, canResetPassword }) {
-    const { data, setData, post, processing, errors, reset } = useForm({
-        email: '',
-        password: '',
-        remember: false,
+    const [processing, setProcessing] = useState(false);
+    const [backendErrors, setBackendErrors] = useState({});
+
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm({
+        resolver: zodResolver(schema),
+        defaultValues: {
+            email: '',
+            password: '',
+            remember: false,
+        }
     });
 
-    const submit = (e) => {
-        e.preventDefault();
-
-        post(route('login'), {
-            onFinish: () => reset('password'),
+    const onSubmit = (data) => {
+        setProcessing(true);
+        router.post(route('login'), data, {
+            onFinish: () => setProcessing(false),
+            onError: (err) => {
+                setProcessing(false);
+                setBackendErrors(err);
+            },
         });
     };
 
@@ -36,48 +59,36 @@ export default function Login({ status, canResetPassword }) {
                 </div>
             )}
 
-            <form onSubmit={submit}>
+            <form onSubmit={handleSubmit(onSubmit)}>
                 <div>
                     <InputLabel htmlFor="email" value="Email" />
-
                     <TextInput
                         id="email"
                         type="email"
-                        name="email"
-                        value={data.email}
                         className="mt-1 block w-full"
                         autoComplete="username"
-                        isFocused={true}
-                        onChange={(e) => setData('email', e.target.value)}
+                        {...register('email')}
                     />
-
-                    <InputError message={errors.email} className="mt-2" />
+                    <InputError message={errors.email?.message || backendErrors.email} className="mt-2" />
                 </div>
 
                 <div className="mt-4">
                     <InputLabel htmlFor="password" value="Password" />
-
                     <TextInput
                         id="password"
                         type="password"
-                        name="password"
-                        value={data.password}
                         className="mt-1 block w-full"
                         autoComplete="current-password"
-                        onChange={(e) => setData('password', e.target.value)}
+                        {...register('password')}
                     />
-
-                    <InputError message={errors.password} className="mt-2" />
+                    <InputError message={errors.password?.message || backendErrors.password} className="mt-2" />
                 </div>
 
                 <div className="mt-6 block">
                     <label className="flex items-center">
                         <Checkbox
                             name="remember"
-                            checked={data.remember}
-                            onChange={(e) =>
-                                setData('remember', e.target.checked)
-                            }
+                            {...register('remember')}
                         />
                         <span className="ms-2 text-sm text-gray-500 font-medium">
                             Keep me logged in

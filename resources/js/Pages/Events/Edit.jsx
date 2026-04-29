@@ -3,27 +3,62 @@ import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { useState } from 'react';
+
+const schema = z.object({
+    title: z.string().min(5, 'Title must be at least 5 characters'),
+    description: z.string().min(20, 'Description must be at least 20 characters'),
+    distance: z.string().min(1, 'Distance is required'),
+    date: z.string().min(1, 'Race date is required'),
+    location: z.string().min(1, 'Location is required'),
+    max_participants: z.coerce.number().min(1, 'Must have at least 1 participant'),
+    registration_start: z.string().min(1, 'Registration start is required'),
+    registration_end: z.string().min(1, 'Registration end is required'),
+    race_start_time: z.string().min(1, 'Start time is required'),
+    cut_off_time: z.string().min(1, 'Cut-off time is required'),
+    organizer_name: z.string().min(1, 'Organizer name is required'),
+    contact: z.string().min(1, 'Contact info is required'),
+});
 
 export default function Edit({ event }) {
-    const { data, setData, patch, processing, errors } = useForm({
-        title: event.title,
-        description: event.description,
-        distance: event.distance,
-        date: event.date,
-        location: event.location,
-        max_participants: event.max_participants,
-        registration_start: event.registration_start,
-        registration_end: event.registration_end,
-        race_start_time: event.race_start_time,
-        cut_off_time: event.cut_off_time,
-        organizer_name: event.organizer_name,
-        contact: event.contact,
+    const [processing, setProcessing] = useState(false);
+    const [backendErrors, setBackendErrors] = useState({});
+
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm({
+        resolver: zodResolver(schema),
+        defaultValues: {
+            title: event.title,
+            description: event.description,
+            distance: event.distance,
+            date: event.date,
+            location: event.location,
+            max_participants: event.max_participants,
+            registration_start: event.registration_start,
+            registration_end: event.registration_end,
+            race_start_time: event.race_start_time,
+            cut_off_time: event.cut_off_time,
+            organizer_name: event.organizer_name,
+            contact: event.contact,
+        }
     });
 
-    const submit = (e) => {
-        e.preventDefault();
-        patch(route('events.update', event.id));
+    const onSubmit = (data) => {
+        setProcessing(true);
+        router.patch(route('events.update', event.id), data, {
+            onFinish: () => setProcessing(false),
+            onError: (err) => {
+                setProcessing(false);
+                setBackendErrors(err);
+            },
+        });
     };
 
     return (
@@ -33,26 +68,76 @@ export default function Edit({ event }) {
             <Head title="Edit Event" />
 
             <div className="mx-auto max-w-4xl overflow-hidden rounded-[2.5rem] border border-gray-100 bg-white shadow-2xl">
-                <form onSubmit={submit} className="p-8 md:p-12">
+                <form onSubmit={handleSubmit(onSubmit)} className="p-8 md:p-12">
                     <div className="grid gap-8 md:grid-cols-2">
                         <div className="md:col-span-2">
                             <InputLabel value="Event Title" />
-                            <TextInput className="mt-1 block w-full" value={data.title} onChange={(e) => setData('title', e.target.value)} required />
-                            <InputError message={errors.title} className="mt-2" />
+                            <TextInput id="title" className="mt-1 block w-full" {...register('title')} />
+                            <InputError message={errors.title?.message || backendErrors.title} className="mt-2" />
                         </div>
                         <div className="md:col-span-2">
                             <InputLabel value="Description" />
-                            <textarea className="mt-1 block w-full rounded-xl border-gray-200" rows="4" value={data.description} onChange={(e) => setData('description', e.target.value)} required></textarea>
-                            <InputError message={errors.description} className="mt-2" />
+                            <textarea 
+                                id="description"
+                                className="mt-1 block w-full rounded-xl border-gray-200 focus:border-[#FF5722] focus:ring-[#FF5722]" 
+                                rows="4" 
+                                {...register('description')}
+                            ></textarea>
+                            <InputError message={errors.description?.message || backendErrors.description} className="mt-2" />
                         </div>
-                        {/* Simplified for brevity, same fields as Create */}
+                        
                         <div>
                             <InputLabel value="Distance" />
-                            <TextInput className="mt-1 block w-full" value={data.distance} onChange={(e) => setData('distance', e.target.value)} required />
+                            <TextInput className="mt-1 block w-full" {...register('distance')} />
+                            <InputError message={errors.distance?.message || backendErrors.distance} className="mt-2" />
                         </div>
                         <div>
-                            <InputLabel value="Date" />
-                            <TextInput type="date" className="mt-1 block w-full" value={data.date} onChange={(e) => setData('date', e.target.value)} required />
+                            <InputLabel value="Race Date" />
+                            <TextInput type="date" className="mt-1 block w-full" {...register('date')} />
+                            <InputError message={errors.date?.message || backendErrors.date} className="mt-2" />
+                        </div>
+                        <div>
+                            <InputLabel value="Location" />
+                            <TextInput className="mt-1 block w-full" {...register('location')} />
+                            <InputError message={errors.location?.message || backendErrors.location} className="mt-2" />
+                        </div>
+                        <div>
+                            <InputLabel value="Max Participants" />
+                            <TextInput type="number" className="mt-1 block w-full" {...register('max_participants')} />
+                            <InputError message={errors.max_participants?.message || backendErrors.max_participants} className="mt-2" />
+                        </div>
+                        
+                        <div>
+                            <InputLabel value="Registration Start" />
+                            <TextInput type="date" className="mt-1 block w-full" {...register('registration_start')} />
+                            <InputError message={errors.registration_start?.message || backendErrors.registration_start} className="mt-2" />
+                        </div>
+                        <div>
+                            <InputLabel value="Registration End" />
+                            <TextInput type="date" className="mt-1 block w-full" {...register('registration_end')} />
+                            <InputError message={errors.registration_end?.message || backendErrors.registration_end} className="mt-2" />
+                        </div>
+
+                        <div>
+                            <InputLabel value="Start Time" />
+                            <TextInput type="time" className="mt-1 block w-full" {...register('race_start_time')} />
+                            <InputError message={errors.race_start_time?.message || backendErrors.race_start_time} className="mt-2" />
+                        </div>
+                        <div>
+                            <InputLabel value="Cut-off Time" />
+                            <TextInput type="time" className="mt-1 block w-full" {...register('cut_off_time')} />
+                            <InputError message={errors.cut_off_time?.message || backendErrors.cut_off_time} className="mt-2" />
+                        </div>
+
+                        <div>
+                            <InputLabel value="Organizer Name" />
+                            <TextInput className="mt-1 block w-full" {...register('organizer_name')} />
+                            <InputError message={errors.organizer_name?.message || backendErrors.organizer_name} className="mt-2" />
+                        </div>
+                        <div>
+                            <InputLabel value="Contact Info" />
+                            <TextInput className="mt-1 block w-full" {...register('contact')} />
+                            <InputError message={errors.contact?.message || backendErrors.contact} className="mt-2" />
                         </div>
                     </div>
 

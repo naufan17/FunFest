@@ -3,7 +3,16 @@ import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import { Transition } from '@headlessui/react';
-import { Link, useForm, usePage } from '@inertiajs/react';
+import { Link, usePage, router } from '@inertiajs/react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { useState } from 'react';
+
+const schema = z.object({
+    name: z.string().min(2, 'Name must be at least 2 characters'),
+    email: z.string().email('Invalid email address'),
+});
 
 export default function UpdateProfileInformation({
     mustVerifyEmail,
@@ -11,16 +20,35 @@ export default function UpdateProfileInformation({
     className = '',
 }) {
     const user = usePage().props.auth.user;
+    const [processing, setProcessing] = useState(false);
+    const [recentlySuccessful, setRecentlySuccessful] = useState(false);
+    const [backendErrors, setBackendErrors] = useState({});
 
-    const { data, setData, patch, errors, processing, recentlySuccessful } =
-        useForm({
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm({
+        resolver: zodResolver(schema),
+        defaultValues: {
             name: user.name,
             email: user.email,
-        });
+        },
+    });
 
-    const submit = (e) => {
-        e.preventDefault();
-        patch(route('profile.update'));
+    const onSubmit = (data) => {
+        setProcessing(true);
+        router.patch(route('profile.update'), data, {
+            onSuccess: () => {
+                setProcessing(false);
+                setRecentlySuccessful(true);
+                setTimeout(() => setRecentlySuccessful(false), 2000);
+            },
+            onError: (err) => {
+                setProcessing(false);
+                setBackendErrors(err);
+            },
+        });
     };
 
     return (
@@ -34,19 +62,15 @@ export default function UpdateProfileInformation({
                 </p>
             </header>
 
-            <form onSubmit={submit} className="mt-6 space-y-8 max-w-2xl">
+            <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-8 max-w-2xl">
                 <div>
                     <InputLabel htmlFor="name" value="Full Name" className="text-[10px] font-black uppercase tracking-widest text-gray-400" />
                     <TextInput
                         id="name"
                         className="mt-2 block w-full"
-                        value={data.name}
-                        onChange={(e) => setData('name', e.target.value)}
-                        required
-                        isFocused
-                        autoComplete="name"
+                        {...register('name')}
                     />
-                    <InputError className="mt-2" message={errors.name} />
+                    <InputError className="mt-2" message={errors.name?.message || backendErrors.name} />
                 </div>
 
                 <div>
@@ -55,12 +79,9 @@ export default function UpdateProfileInformation({
                         id="email"
                         type="email"
                         className="mt-2 block w-full"
-                        value={data.email}
-                        onChange={(e) => setData('email', e.target.value)}
-                        required
-                        autoComplete="username"
+                        {...register('email')}
                     />
-                    <InputError className="mt-2" message={errors.email} />
+                    <InputError className="mt-2" message={errors.email?.message || backendErrors.email} />
                 </div>
 
                 {mustVerifyEmail && user.email_verified_at === null && (
