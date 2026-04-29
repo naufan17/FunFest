@@ -21,5 +21,13 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Vite::prefetch(concurrency: 3);
+
+        \Illuminate\Support\Facades\Gate::define('admin', function ($user) {
+            return $user->role === 'admin';
+        });
+
+        \Illuminate\Support\Facades\Gate::define('organizer', function ($user) {
+            return $user->role === 'organizer' || $user->role === 'admin';
+        });
     }
 }

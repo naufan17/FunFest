@@ -107,7 +107,34 @@ export default function Register() {
                     />
                 </div>
 
-                <div className="mt-8 flex flex-col gap-4">
+                <div className="mt-6">
+                    <InputLabel value="Register as" />
+                    <div className="mt-2 grid grid-cols-2 gap-4">
+                        {[
+                            { id: 'participant', label: 'Runner', desc: 'I want to join races' },
+                            { id: 'organizer', label: 'Organizer', desc: 'I want to host races' }
+                        ].map((r) => (
+                            <button
+                                key={r.id}
+                                type="button"
+                                onClick={() => setData('role', r.id)}
+                                className={`rounded-2xl border-2 p-4 text-left transition-all ${
+                                    data.role === r.id 
+                                    ? 'border-[#FF5722] bg-orange-50' 
+                                    : 'border-gray-100 bg-white hover:border-gray-200'
+                                }`}
+                            >
+                                <p className={`font-black italic uppercase tracking-wider text-xs ${data.role === r.id ? 'text-[#FF5722]' : 'text-gray-400'}`}>
+                                    {r.label}
+                                </p>
+                                <p className="text-[10px] text-gray-500 mt-1">{r.desc}</p>
+                            </button>
+                        ))}
+                    </div>
+                    <InputError message={errors.role} className="mt-2" />
+                </div>
+
+                <div className="mt-10 flex flex-col gap-4">
                     <PrimaryButton className="w-full" disabled={processing}>
                         Create Account
                     </PrimaryButton>
