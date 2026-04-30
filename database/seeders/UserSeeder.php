@@ -41,7 +41,11 @@ class UserSeeder extends Seeder
             'role' => 'participant',
         ]);
 
-        User::factory(10)->create([
+        User::factory(5)->create([
+            'role' => 'organizer',
+        ]);
+
+        User::factory(50)->create([
             'role' => 'participant',
         ]);
     }

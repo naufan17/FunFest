@@ -67,5 +67,12 @@ class EventSeeder extends Seeder
             EventCategory::create(['event_id' => $event->id, 'gender' => 'male']);
             EventCategory::create(['event_id' => $event->id, 'gender' => 'female']);
         }
+
+        // Generate 15 more random events
+        $randomEvents = Event::factory(15)->create();
+        foreach ($randomEvents as $event) {
+            EventCategory::create(['event_id' => $event->id, 'gender' => 'male']);
+            EventCategory::create(['event_id' => $event->id, 'gender' => 'female']);
+        }
     }
 }

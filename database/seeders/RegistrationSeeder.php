@@ -16,17 +16,17 @@ class RegistrationSeeder extends Seeder
 
         foreach ($events as $event) {
             // Register some users for each event
-            $toRegister = $participants->random(min(5, $participants->count()));
+            $toRegister = $participants->random(rand(10, min(20, $participants->count())));
 
             foreach ($toRegister as $index => $user) {
                 $status = 'registered';
                 $finishTime = null;
 
                 // Randomly set some as checked in or finished
-                if ($index < 2) {
+                if ($index < 5) {
                     $status = 'finished';
                     $finishTime = sprintf('%02d:%02d:%02d', 0, rand(20, 59), rand(0, 59));
-                } elseif ($index < 4) {
+                } elseif ($index < 10) {
                     $status = 'checked_in';
                 }
 
