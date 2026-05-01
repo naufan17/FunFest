@@ -23,7 +23,7 @@ class DashboardController extends Controller
                     'totalRegistrations' => Registration::count(),
                 ],
                 'recentActivity' => [
-                    'paginatedUsers' => User::latest()->paginate(10),
+                    'latestUsers' => User::latest()->take(5)->get(),
                     'latestEvents' => Event::latest()->take(5)->get(),
                 ]
             ]);

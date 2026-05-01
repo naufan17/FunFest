@@ -1,5 +1,5 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 
 export default function Users({ auth, users }) {
     const { patch: updateRole, delete: deleteUser } = useForm();
@@ -37,7 +37,7 @@ export default function Users({ auth, users }) {
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-50">
-                        {users.map(user => (
+                        {users.data.map((user) => (
                             <tr key={user.id} className="hover:bg-gray-50/50 transition-colors">
                                 <td className="px-8 py-8">
                                     <p className="font-black italic text-lg text-[#0A1D37]">{user.name}</p>

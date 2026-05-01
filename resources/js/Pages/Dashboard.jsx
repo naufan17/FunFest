@@ -45,9 +45,9 @@ export default function Dashboard({ auth, stats, recentActivity, myActivities = 
                     <div className="grid gap-10 lg:grid-cols-2">
                          <section className="rounded-[2.5rem] bg-[#0A1D37] p-10 text-white shadow-2xl flex flex-col justify-between">
                             <div>
-                                <h3 className="mb-8 text-xs font-black uppercase tracking-[0.2em] text-[#FF5722]">User Influx (Paginated)</h3>
+                                <h3 className="mb-8 text-xs font-black uppercase tracking-[0.2em] text-[#FF5722]">User Influx</h3>
                                 <div className="space-y-6">
-                                    {recentActivity.paginatedUsers.data.map((u) => (
+                                    {recentActivity.latestUsers.map((u) => (
                                         <div key={u.id} className="flex items-center justify-between border-b border-white/5 pb-4 last:border-0 last:pb-0">
                                             <div>
                                                 <p className="font-bold">{u.name}</p>
@@ -60,7 +60,7 @@ export default function Dashboard({ auth, stats, recentActivity, myActivities = 
                             </div>
                             
                             {/* Pagination */}
-                            {recentActivity.paginatedUsers.links && recentActivity.paginatedUsers.data.length > 0 && (
+                            {/* {recentActivity.paginatedUsers.links && recentActivity.paginatedUsers.data.length > 0 && (
                                 <div className="mt-8 pt-4 border-t border-white/10 flex justify-center gap-2 flex-wrap">
                                     {recentActivity.paginatedUsers.links.map((link, index) => (
                                         <Link
@@ -78,7 +78,7 @@ export default function Dashboard({ auth, stats, recentActivity, myActivities = 
                                         />
                                     ))}
                                 </div>
-                            )}
+                            )} */}
                          </section>
 
                          <section className="rounded-[2.5rem] border border-gray-100 bg-white p-10 shadow-sm">
