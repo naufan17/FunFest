@@ -22,6 +22,7 @@ const schema = z.object({
     cut_off_time: z.string().min(1, 'Cut-off time is required'),
     organizer_name: z.string().min(1, 'Organizer name is required'),
     contact: z.string().min(1, 'Contact info is required'),
+    banner_image: z.any().optional(),
 });
 
 export default function Edit({ event }) {
@@ -52,7 +53,14 @@ export default function Edit({ event }) {
 
     const onSubmit = (data) => {
         setProcessing(true);
-        router.patch(route('events.update', event.id), data, {
+        const submitData = { ...data, _method: 'patch' };
+        if (submitData.banner_image && submitData.banner_image.length > 0) {
+            submitData.banner_image = submitData.banner_image[0];
+        } else {
+            delete submitData.banner_image;
+        }
+
+        router.post(route('events.update', event.id), submitData, {
             onFinish: () => setProcessing(false),
             onError: (err) => {
                 setProcessing(false);
@@ -84,6 +92,18 @@ export default function Edit({ event }) {
                                 {...register('description')}
                             ></textarea>
                             <InputError message={errors.description?.message || backendErrors.description} className="mt-2" />
+                        </div>
+                        
+                        <div className="md:col-span-2">
+                            <InputLabel htmlFor="banner_image" value="Event Banner Image (Optional)" />
+                            <input 
+                                id="banner_image" 
+                                type="file" 
+                                accept="image/*"
+                                className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-[#FF5722] hover:file:bg-orange-100" 
+                                {...register('banner_image')}
+                            />
+                            <InputError message={errors.banner_image?.message || backendErrors.banner_image} className="mt-2" />
                         </div>
                         
                         <div>

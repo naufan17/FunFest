@@ -43,19 +43,42 @@ export default function Dashboard({ auth, stats, recentActivity, myActivities = 
                     </div>
 
                     <div className="grid gap-10 lg:grid-cols-2">
-                         <section className="rounded-[2.5rem] bg-[#0A1D37] p-10 text-white shadow-2xl">
-                            <h3 className="mb-8 text-xs font-black uppercase tracking-[0.2em] text-[#FF5722]">User Influx</h3>
-                            <div className="space-y-6">
-                                {recentActivity.latestUsers.map((u) => (
-                                    <div key={u.id} className="flex items-center justify-between border-b border-white/5 pb-4 last:border-0 last:pb-0">
-                                        <div>
-                                            <p className="font-bold">{u.name}</p>
-                                            <p className="text-xs text-gray-400 uppercase tracking-widest">{u.email}</p>
+                         <section className="rounded-[2.5rem] bg-[#0A1D37] p-10 text-white shadow-2xl flex flex-col justify-between">
+                            <div>
+                                <h3 className="mb-8 text-xs font-black uppercase tracking-[0.2em] text-[#FF5722]">User Influx (Paginated)</h3>
+                                <div className="space-y-6">
+                                    {recentActivity.paginatedUsers.data.map((u) => (
+                                        <div key={u.id} className="flex items-center justify-between border-b border-white/5 pb-4 last:border-0 last:pb-0">
+                                            <div>
+                                                <p className="font-bold">{u.name}</p>
+                                                <p className="text-xs text-gray-400 uppercase tracking-widest">{u.email}</p>
+                                            </div>
+                                            <span className="rounded-full bg-white/10 px-3 py-1 text-[9px] font-black uppercase tracking-widest">{u.role}</span>
                                         </div>
-                                        <span className="rounded-full bg-white/10 px-3 py-1 text-[9px] font-black uppercase tracking-widest">{u.role}</span>
-                                    </div>
-                                ))}
+                                    ))}
+                                </div>
                             </div>
+                            
+                            {/* Pagination */}
+                            {recentActivity.paginatedUsers.links && recentActivity.paginatedUsers.data.length > 0 && (
+                                <div className="mt-8 pt-4 border-t border-white/10 flex justify-center gap-2 flex-wrap">
+                                    {recentActivity.paginatedUsers.links.map((link, index) => (
+                                        <Link
+                                            key={index}
+                                            href={link.url || '#'}
+                                            preserveScroll
+                                            className={`rounded-full px-3 py-1 text-xs font-bold transition-all ${
+                                                link.active 
+                                                    ? 'bg-[#FF5722] text-white shadow-lg' 
+                                                    : !link.url 
+                                                        ? 'bg-white/5 text-gray-500 cursor-not-allowed'
+                                                        : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                                            }`}
+                                            dangerouslySetInnerHTML={{ __html: link.label }}
+                                        />
+                                    ))}
+                                </div>
+                            )}
                          </section>
 
                          <section className="rounded-[2.5rem] border border-gray-100 bg-white p-10 shadow-sm">

@@ -14,6 +14,15 @@ class RegistrationController extends Controller
             'gender' => 'required|in:male,female',
         ]);
 
+        $now = now()->format('Y-m-d');
+        if ($now < $event->registration_start || $now > $event->registration_end) {
+            return back()->withErrors(['error' => 'Registration for this event is currently closed.']);
+        }
+
+        if ($event->registrations()->count() >= $event->max_participants) {
+            return back()->withErrors(['error' => 'This event has reached its maximum participant limit.']);
+        }
+
         Registration::create([
             'user_id' => $request->user()->id,
             'event_id' => $event->id,
@@ -28,9 +37,7 @@ class RegistrationController extends Controller
     {
         // Only organizer or admin can update status/time
         $event = $registration->event;
-        if ($event->created_by !== auth()->id() && auth()->user()->role !== 'admin') {
-            abort(403);
-        }
+        \Illuminate\Support\Facades\Gate::authorize('update', $registration);
 
         $validated = $request->validate([
             'status' => 'sometimes|in:registered,checked_in,finished',

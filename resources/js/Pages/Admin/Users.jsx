@@ -70,6 +70,26 @@ export default function Users({ auth, users }) {
                         ))}
                     </tbody>
                 </table>
+                
+                {users.links && users.data.length > 0 && (
+                    <div className="p-8 border-t border-gray-100 flex justify-center gap-2 flex-wrap">
+                        {users.links.map((link, index) => (
+                            <Link
+                                key={index}
+                                href={link.url || '#'}
+                                preserveScroll
+                                className={`rounded-full px-4 py-2 text-xs font-bold transition-all ${
+                                    link.active 
+                                        ? 'bg-[#0A1D37] text-white shadow-lg' 
+                                        : !link.url 
+                                            ? 'bg-gray-50 text-gray-400 cursor-not-allowed'
+                                            : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
+                                }`}
+                                dangerouslySetInnerHTML={{ __html: link.label }}
+                            />
+                        ))}
+                    </div>
+                )}
             </div>
         </AuthenticatedLayout>
     );

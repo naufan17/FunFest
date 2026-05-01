@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreEventRequest;
+use App\Http\Requests\UpdateEventRequest;
 use App\Models\Event;
 use App\Models\EventCategory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class EventController extends Controller
@@ -12,50 +16,42 @@ class EventController extends Controller
     public function index()
     {
         return Inertia::render('Events/Index', [
-            'events' => Event::withCount('registrations')->latest()->get()
+            'events' => Event::withCount('registrations')->latest()->paginate(12)
         ]);
     }
 
     public function create()
     {
-        if (\Illuminate\Support\Facades\Gate::denies('organizer')) {
-            abort(403);
-        }
+        \Illuminate\Support\Facades\Gate::authorize('create', Event::class);
         return Inertia::render('Events/Create');
     }
 
-    public function store(Request $request)
+    public function store(StoreEventRequest $request)
     {
-        if (\Illuminate\Support\Facades\Gate::denies('organizer')) {
-            abort(403);
+        \Illuminate\Support\Facades\Gate::authorize('create', Event::class);
+
+        $validated = $request->validated();
+        
+        $bannerUrl = null;
+        if ($request->hasFile('banner_image')) {
+            $path = $request->file('banner_image')->store('events', 'public');
+            $bannerUrl = '/storage/' . $path;
         }
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'distance' => 'required|string',
-            'date' => 'required|date',
-            'location' => 'required|string',
-            'max_participants' => 'required|integer',
-            'registration_start' => 'required|date',
-            'registration_end' => 'required|date',
-            'race_start_time' => 'required',
-            'cut_off_time' => 'required',
-            'organizer_name' => 'required|string',
-            'contact' => 'required|string',
-            'categories' => 'required|array', // e.g. ['male', 'female']
-        ]);
 
-        $event = Event::create([
-            ...$validated,
-            'created_by' => $request->user()->id,
-        ]);
-
-        foreach ($validated['categories'] as $gender) {
-            EventCategory::create([
-                'event_id' => $event->id,
-                'gender' => $gender,
+        DB::transaction(function () use ($validated, $request, $bannerUrl) {
+            $event = Event::create([
+                ...collect($validated)->except(['categories', 'banner_image'])->toArray(),
+                'banner_url' => $bannerUrl,
+                'created_by' => $request->user()->id,
             ]);
-        }
+
+            foreach ($validated['categories'] as $gender) {
+                EventCategory::create([
+                    'event_id' => $event->id,
+                    'gender' => $gender,
+                ]);
+            }
+        });
 
         return redirect()->route('events.index');
     }
@@ -76,43 +72,35 @@ class EventController extends Controller
 
     public function edit(Event $event)
     {
-        if ($event->created_by !== auth()->id() && auth()->user()->role !== 'admin') {
-            abort(403);
-        }
+        \Illuminate\Support\Facades\Gate::authorize('update', $event);
         return Inertia::render('Events/Edit', ['event' => $event]);
     }
 
-    public function update(Request $request, Event $event)
+    public function update(UpdateEventRequest $request, Event $event)
     {
-        if ($event->created_by !== auth()->id() && auth()->user()->role !== 'admin') {
-            abort(403);
-        }
+        \Illuminate\Support\Facades\Gate::authorize('update', $event);
         
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'distance' => 'required|string',
-            'date' => 'required|date',
-            'location' => 'required|string',
-            'max_participants' => 'required|integer',
-            'registration_start' => 'required|date',
-            'registration_end' => 'required|date',
-            'race_start_time' => 'required',
-            'cut_off_time' => 'required',
-            'organizer_name' => 'required|string',
-            'contact' => 'required|string',
-        ]);
+        $validated = $request->validated();
+        
+        $dataToUpdate = collect($validated)->except(['banner_image'])->toArray();
 
-        $event->update($validated);
+        if ($request->hasFile('banner_image')) {
+            // Delete old banner if exists
+            if ($event->banner_url) {
+                Storage::disk('public')->delete(str_replace('/storage/', '', $event->banner_url));
+            }
+            $path = $request->file('banner_image')->store('events', 'public');
+            $dataToUpdate['banner_url'] = '/storage/' . $path;
+        }
+
+        $event->update($dataToUpdate);
 
         return redirect()->route('events.show', $event->id);
     }
 
     public function destroy(Event $event)
     {
-        if ($event->created_by !== auth()->id() && auth()->user()->role !== 'admin') {
-            abort(403);
-        }
+        \Illuminate\Support\Facades\Gate::authorize('delete', $event);
         $event->delete();
         return redirect()->route('events.index');
     }

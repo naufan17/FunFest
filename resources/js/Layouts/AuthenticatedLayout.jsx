@@ -22,13 +22,15 @@ export default function AuthenticatedLayout({ header, children }) {
                             </div>
 
                             <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                <NavLink
-                                    href={route('dashboard')}
-                                    active={route().current('dashboard')}
-                                    className="font-bold uppercase tracking-widest text-xs"
-                                >
-                                    Dashboard
-                                </NavLink>
+                                {user && (
+                                    <NavLink
+                                        href={route('dashboard')}
+                                        active={route().current('dashboard')}
+                                        className="font-bold uppercase tracking-widest text-xs"
+                                    >
+                                        Dashboard
+                                    </NavLink>
+                                )}
                                 <NavLink
                                     href={route('events.index')}
                                     active={route().current('events.*')}

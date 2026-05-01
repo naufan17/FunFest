@@ -7,7 +7,15 @@ export default function Show({ auth, event, isOwner, isRegistered, registration 
     const isAdmin = auth.user?.role === 'admin';
     const [activeTab, setActiveTab] = useState('info'); // 'info', 'participants', 'leaderboard'
 
-    const { post: joinEvent, processing: joining } = useForm({ gender: '' });
+    const isOutdated = event.date < new Date().toISOString().split('T')[0];
+    const isFull = event.registrations.length >= event.max_participants;
+
+    const maskName = (name) => {
+        if (isOwner || isAdmin) return name;
+        return name.split(' ').map(word => word.charAt(0) + '*'.repeat(Math.max(1, word.length - 1))).join(' ');
+    };
+
+    const { post: joinEvent, processing: joining, errors: joinErrors } = useForm({ gender: '' });
     const { patch: updateRegistration, processing: updating } = useForm({ status: '', finish_time: '' });
 
     const handleJoin = (gender) => {
@@ -43,6 +51,15 @@ export default function Show({ auth, event, isOwner, isRegistered, registration 
                             <span className="rounded-full bg-orange-100 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-[#FF5722]">
                                 {event.distance}
                             </span>
+                            {isOutdated ? (
+                                <span className="rounded-full bg-red-100 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-red-600">
+                                    OUTDATED
+                                </span>
+                            ) : (
+                                <span className="rounded-full bg-green-100 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-green-600">
+                                    INCOMING
+                                </span>
+                            )}
                             <span className="text-xs font-bold text-gray-400">📅 {event.date}</span>
                         </div>
                         <h2 className="text-4xl font-black italic tracking-tight text-[#0A1D37] leading-none">{event.title}</h2>
@@ -118,7 +135,7 @@ export default function Show({ auth, event, isOwner, isRegistered, registration 
                                 <tbody className="divide-y divide-gray-50">
                                     {event.registrations.map(reg => (
                                         <tr key={reg.id} className="hover:bg-gray-50/50 transition-colors">
-                                            <td className="px-6 py-6 font-bold text-[#0A1D37]">{reg.user.name}</td>
+                                            <td className="px-6 py-6 font-bold text-[#0A1D37]">{maskName(reg.user.name)}</td>
                                             <td className="px-6 py-6 text-sm text-gray-500 uppercase">{reg.gender}</td>
                                             <td className="px-6 py-6">
                                                 <span className={`rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest ${
@@ -162,7 +179,7 @@ export default function Show({ auth, event, isOwner, isRegistered, registration 
                                                     <div key={r.id} className="flex items-center justify-between">
                                                         <div className="flex items-center gap-4">
                                                             <span className="text-xl font-black italic text-gray-200">#{i + 1}</span>
-                                                            <span className="font-bold">{r.user.name}</span>
+                                                            <span className="font-bold">{maskName(r.user.name)}</span>
                                                         </div>
                                                         <span className="font-mono font-black text-[#FF5722]">{r.finish_time}</span>
                                                     </div>
@@ -207,6 +224,11 @@ export default function Show({ auth, event, isOwner, isRegistered, registration 
                                     <div>
                                         <h3 className="text-2xl font-black italic uppercase tracking-tight">READY TO JOIN?</h3>
                                         <p className="text-gray-400 mt-2">Select your category below</p>
+                                        {joinErrors?.error && (
+                                            <div className="mt-4 rounded-xl bg-red-500/20 p-4 border border-red-500/50">
+                                                <p className="text-xs font-bold text-red-200">{joinErrors.error}</p>
+                                            </div>
+                                        )}
                                     </div>
                                     <div className="space-y-4">
                                         {event.categories.map(cat => (
@@ -219,16 +241,28 @@ export default function Show({ auth, event, isOwner, isRegistered, registration 
                                                         handleJoin(cat.gender);
                                                     }
                                                 }}
-                                                disabled={joining}
-                                                className="w-full rounded-2xl bg-white px-6 py-4 text-center font-black uppercase tracking-widest text-[#0A1D37] transition-all hover:bg-[#FF5722] hover:text-white"
+                                                disabled={joining || isOutdated || isFull}
+                                                className={`w-full rounded-2xl px-6 py-4 text-center font-black uppercase tracking-widest transition-all ${
+                                                    isOutdated || isFull 
+                                                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+                                                        : 'bg-white text-[#0A1D37] hover:bg-[#FF5722] hover:text-white'
+                                                }`}
                                             >
                                                 JOIN AS {cat.gender}
                                             </button>
                                         ))}
                                     </div>
                                     <div className="flex items-center gap-2 text-[10px] uppercase font-black tracking-widest text-gray-500">
-                                        <span className="inline-block h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
-                                        {event.max_participants - event.registrations.length} slots remaining
+                                        {isOutdated ? (
+                                            <span className="text-red-400">Event is closed</span>
+                                        ) : isFull ? (
+                                            <span className="text-red-400">Event is full</span>
+                                        ) : (
+                                            <>
+                                                <span className="inline-block h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
+                                                {event.max_participants - event.registrations.length} slots remaining
+                                            </>
+                                        )}
                                     </div>
                                 </div>
                             )}
