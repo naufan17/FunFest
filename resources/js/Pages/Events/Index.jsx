@@ -1,5 +1,6 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
+import Button from '@/Components/Button';
 
 export default function Index({ auth, events }) {
     return (
@@ -58,12 +59,14 @@ export default function Index({ auth, events }) {
                                 </div>
                                 <span className="text-xs font-bold text-gray-500">{e.max_participants - e.registrations_count} slots left</span>
                             </div>
-                            <Link
+                            <Button
+                                as={Link}
                                 href={route('events.show', e.id)}
-                                className="block w-full rounded-full bg-[#0A1D37] py-3 text-center text-xs font-black uppercase tracking-widest text-white transition-all hover:bg-black"
+                                variant="secondary"
+                                className="w-full"
                             >
                                 View Details
-                            </Link>
+                            </Button>
                         </div>
                     </div>
                 ))}

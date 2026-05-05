@@ -1,5 +1,6 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
+import Button from '@/Components/Button';
 
 export default function Dashboard({ auth, stats, recentActivity, myActivities = [], myEvents = [] }) {
     const isAdmin = auth.user.role === 'admin';
@@ -108,8 +109,12 @@ export default function Dashboard({ auth, stats, recentActivity, myActivities = 
                             <h1 className="mt-2 text-6xl font-black italic tracking-tighter">READY FOR THE NEXT CHALLENGE?</h1>
                             <p className="mt-6 text-lg text-gray-300 leading-relaxed max-w-xl">You've got races coming up. Stay focused, stay hydrated, and keep pushing your limits.</p>
                             <div className="mt-10 flex gap-4">
-                                <Link href={route('events.index')} className="rounded-full bg-[#FF5722] px-10 py-4 text-xs font-black uppercase tracking-widest shadow-xl shadow-orange-500/40 transition-transform hover:scale-105 active:scale-95">Explore Races</Link>
-                                <button className="rounded-full border-2 border-white/20 bg-white/5 px-10 py-4 text-xs font-black uppercase tracking-widest backdrop-blur-sm hover:bg-white/10">Training Log</button>
+                                <Button as={Link} href={route('events.index')} size="lg" className="shadow-xl shadow-orange-500/40">
+                                    Explore Races
+                                </Button>
+                                <Button variant="ghost" size="lg" className="border-2 border-white/20 bg-white/5 text-white hover:bg-white/10">
+                                    Training Log
+                                </Button>
                             </div>
                         </div>
                         <div className="absolute right-[-10%] top-[-20%] text-[20rem] font-black italic opacity-5 pointer-events-none select-none">RUN</div>
@@ -165,12 +170,15 @@ export default function Dashboard({ auth, stats, recentActivity, myActivities = 
                             <h2 className="text-sm font-black uppercase tracking-[0.3em] text-[#FF5722]">Event Director</h2>
                             <h1 className="text-5xl font-black italic tracking-tighter text-[#0A1D37]">ORGANIZER HUB</h1>
                         </div>
-                        <Link
+                        <Button
+                            as={Link}
                             href={route('events.create')}
-                            className="rounded-2xl bg-[#0A1D37] px-10 py-5 text-sm font-black uppercase tracking-widest text-white shadow-2xl transition-all hover:bg-black hover:-translate-y-1 active:translate-y-0"
+                            variant="secondary"
+                            size="lg"
+                            className="shadow-2xl"
                         >
                             + NEW EVENT
-                        </Link>
+                        </Button>
                     </div>
 
                     <div className="grid gap-8 md:grid-cols-2">
@@ -208,14 +216,16 @@ export default function Dashboard({ auth, stats, recentActivity, myActivities = 
                                 <h3 className="text-xs font-black uppercase tracking-[0.2em] text-orange-200">Management Tips</h3>
                                 <p className="mt-4 text-2xl font-black italic tracking-tight">ENGAGE YOUR COMMUNITY</p>
                                 <p className="mt-4 text-sm text-orange-50 font-medium leading-relaxed opacity-80">Check your participant lists regularly and ensure all race logistics are updated at least 48 hours before the start time.</p>
-                                <button className="mt-8 rounded-full bg-white/20 px-6 py-3 text-[10px] font-black uppercase tracking-widest backdrop-blur-sm hover:bg-white/30">Read Guide</button>
+                                <Button variant="ghost" size="sm" className="mt-8 bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm">
+                                    Read Guide
+                                </Button>
                             </div>
                             <div className="rounded-[3rem] border border-gray-100 bg-white p-10 shadow-sm">
                                 <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gray-400">Quick Actions</h3>
                                 <div className="mt-6 grid grid-cols-2 gap-4">
                                     {['Export Data', 'Send Updates', 'Review Categories', 'Promote Race'].map(act => (
-                                        <button key={act} className="rounded-2xl border border-gray-50 bg-gray-50/50 p-4 text-left hover:bg-gray-50 transition-colors">
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-[#0A1D37]">{act}</p>
+                                        <button key={act} className="rounded-2xl border border-gray-50 bg-gray-50/50 p-6 text-left hover:bg-gray-50 transition-colors group">
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-[#0A1D37] group-hover:text-[#FF5722] transition-colors">{act}</p>
                                         </button>
                                     ))}
                                 </div>

@@ -20,6 +20,28 @@ class UserController extends Controller
         ]);
     }
 
+    public function store(Request $request)
+    {
+        if (auth()->user()->role !== 'admin') {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => bcrypt($validated['password']),
+            'role' => 'admin',
+        ]);
+
+        return back();
+    }
+
     public function updateRole(Request $request, User $user)
     {
         if (auth()->user()->role !== 'admin') {

@@ -1,5 +1,5 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import PrimaryButton from '@/Components/PrimaryButton';
+import Button from '@/Components/Button';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 
@@ -67,7 +67,9 @@ export default function Show({ auth, event, isOwner, isRegistered, registration 
                     
                     {(isOwner || isAdmin) && (
                         <div className="flex gap-2">
-                            <Link href={route('events.edit', event.id)} className="rounded-full border border-gray-200 bg-white px-6 py-2 text-xs font-bold uppercase tracking-widest hover:border-[#FF5722]">Edit</Link>
+                            <Button as={Link} href={route('events.edit', event.id)} variant="white" size="sm">
+                                Edit Event
+                            </Button>
                         </div>
                     )}
                 </div>
@@ -148,10 +150,14 @@ export default function Show({ auth, event, isOwner, isRegistered, registration 
                                             {(isOwner || isAdmin) && (
                                                 <td className="px-6 py-6 text-right space-x-2">
                                                     {reg.status === 'registered' && (
-                                                        <button onClick={() => handleStatusUpdate(reg.id, 'checked_in')} className="text-[10px] font-black uppercase text-blue-600 hover:underline">Check-in</button>
+                                                        <Button onClick={() => handleStatusUpdate(reg.id, 'checked_in')} variant="ghost" size="sm">
+                                                            Check-in
+                                                        </Button>
                                                     )}
                                                     {reg.status === 'checked_in' && (
-                                                        <button onClick={() => handleResultInput(reg.id)} className="text-[10px] font-black uppercase text-green-600 hover:underline">Input Result</button>
+                                                        <Button onClick={() => handleResultInput(reg.id)} variant="ghost" size="sm" className="text-green-600">
+                                                            Input Result
+                                                        </Button>
                                                     )}
                                                 </td>
                                             )}
@@ -232,7 +238,7 @@ export default function Show({ auth, event, isOwner, isRegistered, registration 
                                     </div>
                                     <div className="space-y-4">
                                         {event.categories.map(cat => (
-                                            <button
+                                            <Button
                                                 key={cat.id}
                                                 onClick={() => {
                                                     if (!auth.user) {
@@ -242,14 +248,11 @@ export default function Show({ auth, event, isOwner, isRegistered, registration 
                                                     }
                                                 }}
                                                 disabled={joining || isOutdated || isFull}
-                                                className={`w-full rounded-2xl px-6 py-4 text-center font-black uppercase tracking-widest transition-all ${
-                                                    isOutdated || isFull 
-                                                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
-                                                        : 'bg-white text-[#0A1D37] hover:bg-[#FF5722] hover:text-white'
-                                                }`}
+                                                variant={isOutdated || isFull ? 'ghost' : 'white'}
+                                                className="w-full py-4 text-lg"
                                             >
                                                 JOIN AS {cat.gender}
-                                            </button>
+                                            </Button>
                                         ))}
                                     </div>
                                     <div className="flex items-center gap-2 text-[10px] uppercase font-black tracking-widest text-gray-500">
