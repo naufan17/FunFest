@@ -1,7 +1,20 @@
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import Logo from '@/Components/ApplicationLogo';
+import { useState, useEffect } from 'react';
+import Toast from '@/Components/Toast';
 
 export default function GuestLayout({ children }) {
+    const { flash } = usePage().props;
+    const [toast, setToast] = useState({ message: '', type: 'success' });
+
+    useEffect(() => {
+        if (flash?.success) {
+            setToast({ message: flash.success, type: 'success' });
+        } else if (flash?.error) {
+            setToast({ message: flash.error, type: 'error' });
+        }
+    }, [flash]);
+
     return (
         <div className="flex min-h-screen flex-col md:flex-row bg-white">
             {/* Left Side: Image Content */}
@@ -43,6 +56,14 @@ export default function GuestLayout({ children }) {
                     © 2026 RunFest. Join the Fest.
                 </div>
             </div>
+
+            {toast.message && (
+                <Toast 
+                    message={toast.message} 
+                    type={toast.type} 
+                    onClose={() => setToast({ message: '', type: 'success' })} 
+                />
+            )}
         </div>
     );
 }

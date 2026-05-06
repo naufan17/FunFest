@@ -1,7 +1,9 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
+import { useEffect, useState } from 'react';
+import Toast from '@/Components/Toast';
 
-const Logo = ({ className = "h-8" }) => (
-    <div className={`flex items-center gap-2 ${className}`}>
+const Logo = ({ className = "h-8", onClick }) => (
+    <div className={`flex items-center gap-2 ${className}`} onClick={onClick}>
         <svg viewBox="0 0 100 100" className="h-full w-auto" fill="none" xmlns="http://www.w3.org/2000/svg">
             {/* Speed Lines */}
             <path d="M10 45H30" stroke="#FF5722" strokeWidth="6" strokeLinecap="round" />
@@ -19,6 +21,39 @@ const Logo = ({ className = "h-8" }) => (
 );
 
 export default function Welcome({ auth, upcomingEvents }) {
+    const { flash } = usePage().props;
+    const [toast, setToast] = useState({ message: '', type: 'success' });
+
+    useEffect(() => {
+        if (flash?.success) {
+            setToast({ message: flash.success, type: 'success' });
+        } else if (flash?.error) {
+            setToast({ message: flash.error, type: 'error' });
+        }
+    }, [flash]);
+
+    const scrollToSection = (e, id) => {
+        e.preventDefault();
+        const element = document.getElementById(id);
+        if (element) {
+            const headerOffset = 55;
+            const elementPosition = element.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.scrollY - headerOffset;
+
+            window.scrollTo({
+                top: offsetPosition,
+                behavior: 'smooth'
+            });
+        }
+    };
+
+    const scrollToTop = (e) => {
+        e.preventDefault();
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    };
     return (
         <>
             <Head title="RunFest - Join the Race, Feel the Fest" />
@@ -26,11 +61,29 @@ export default function Welcome({ auth, upcomingEvents }) {
                 {/* Navigation */}
                 <nav className="fixed top-0 z-50 w-full border-b border-gray-100 bg-white/80 backdrop-blur-md">
                     <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-                        <Logo />
+                        <Logo onClick={scrollToTop} className="cursor-pointer" />
                         <div className="hidden items-center gap-8 md:flex">
-                            <a href="#features" className="font-medium hover:text-[#FF5722] transition-colors">Features</a>
-                            <a href="#how-it-works" className="font-medium hover:text-[#FF5722] transition-colors">How It Works</a>
-                            <a href="#about" className="font-medium hover:text-[#FF5722] transition-colors">About</a>
+                            <a 
+                                href="#features" 
+                                onClick={(e) => scrollToSection(e, 'features')}
+                                className="font-medium hover:text-[#FF5722] transition-colors cursor-pointer"
+                            >
+                                Features
+                            </a>
+                            <a 
+                                href="#how-it-works" 
+                                onClick={(e) => scrollToSection(e, 'how-it-works')}
+                                className="font-medium hover:text-[#FF5722] transition-colors cursor-pointer"
+                            >
+                                How It Works
+                            </a>
+                            <a 
+                                href="#about" 
+                                onClick={(e) => scrollToSection(e, 'about')}
+                                className="font-medium hover:text-[#FF5722] transition-colors cursor-pointer"
+                            >
+                                About
+                            </a>
                         </div>
                         <div className="flex items-center gap-4">
                             {auth.user ? (
@@ -86,7 +139,7 @@ export default function Welcome({ auth, upcomingEvents }) {
                             </Link>
                             <Link
                                 href={route('events.index')}
-                                className="w-full rounded-full border-2 border-white px-10 py-4 text-lg font-black uppercase tracking-wide text-white transition-all hover:bg-white hover:text-[#0A1D37] sm:w-auto"
+                                className="w-full rounded-full border-2 border-white px-10 py-3.5 text-lg font-black uppercase tracking-wide text-white transition-all hover:bg-white hover:text-[#0A1D37] sm:w-auto"
                             >
                                 View Events
                             </Link>
@@ -276,7 +329,7 @@ export default function Welcome({ auth, upcomingEvents }) {
                             </p>
                             <Link
                                 href={route('register')}
-                                className="inline-block rounded-full bg-[#0A1D37] px-12 py-5 text-lg font-black uppercase tracking-widest text-white transition-all hover:scale-105 hover:bg-black shadow-2xl"
+                                className="inline-block rounded-full bg-[#0A1D37] px-10 py-4 text-lg font-black uppercase tracking-widest text-white transition-all hover:scale-105 hover:bg-black shadow-2xl"
                             >
                                 Get Started Now
                             </Link>
@@ -299,6 +352,14 @@ export default function Welcome({ auth, upcomingEvents }) {
                         </div>
                     </div>
                 </footer>
+
+                {toast.message && (
+                    <Toast 
+                        message={toast.message} 
+                        type={toast.type} 
+                        onClose={() => setToast({ message: '', type: 'success' })} 
+                    />
+                )}
             </div>
         </>
     );

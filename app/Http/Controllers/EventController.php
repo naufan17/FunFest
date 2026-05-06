@@ -53,7 +53,7 @@ class EventController extends Controller
             }
         });
 
-        return redirect()->route('events.index');
+        return redirect()->route('events.index')->with('success', 'Event created successfully.');
     }
 
     public function show(Event $event)
@@ -95,13 +95,13 @@ class EventController extends Controller
 
         $event->update($dataToUpdate);
 
-        return redirect()->route('events.show', $event->id);
+        return redirect()->route('events.show', $event->id)->with('success', 'Event updated successfully.');
     }
 
     public function destroy(Event $event)
     {
         \Illuminate\Support\Facades\Gate::authorize('delete', $event);
         $event->delete();
-        return redirect()->route('events.index');
+        return redirect()->route('events.index')->with('success', 'Event deleted successfully.');
     }
 }

@@ -39,7 +39,7 @@ class UserController extends Controller
             'role' => 'admin',
         ]);
 
-        return back();
+        return back()->with('success', 'Administrative account created successfully.');
     }
 
     public function updateRole(Request $request, User $user)
@@ -54,7 +54,7 @@ class UserController extends Controller
 
         $user->update(['role' => $request->role]);
 
-        return back();
+        return back()->with('success', 'User role updated successfully.');
     }
 
     public function destroy(User $user)
@@ -69,6 +69,6 @@ class UserController extends Controller
 
         $user->delete();
 
-        return back();
+        return back()->with('success', 'User deleted successfully.');
     }
 }

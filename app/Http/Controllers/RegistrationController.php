@@ -30,7 +30,7 @@ class RegistrationController extends Controller
             'status' => 'registered',
         ]);
 
-        return back();
+        return back()->with('success', 'You have been successfully registered for ' . $event->name);
     }
 
     public function update(Request $request, Registration $registration)
@@ -46,6 +46,6 @@ class RegistrationController extends Controller
 
         $registration->update($validated);
 
-        return back();
+        return back()->with('success', 'Registration updated successfully.');
     }
 }

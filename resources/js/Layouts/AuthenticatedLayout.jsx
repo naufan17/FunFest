@@ -3,11 +3,22 @@ import Dropdown from '@/Components/Dropdown';
 import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { Link, usePage } from '@inertiajs/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import Toast from '@/Components/Toast';
 
 export default function AuthenticatedLayout({ header, children }) {
     const user = usePage().props.auth.user;
+    const { flash } = usePage().props;
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
+    const [toast, setToast] = useState({ message: '', type: 'success' });
+
+    useEffect(() => {
+        if (flash.success) {
+            setToast({ message: flash.success, type: 'success' });
+        } else if (flash.error) {
+            setToast({ message: flash.error, type: 'error' });
+        }
+    }, [flash]);
 
     return (
         <div className="min-h-screen bg-gray-50 font-sans text-[#0A1D37]">
@@ -149,6 +160,14 @@ export default function AuthenticatedLayout({ header, children }) {
                     {children}
                 </div>
             </main>
+
+            {toast.message && (
+                <Toast 
+                    message={toast.message} 
+                    type={toast.type} 
+                    onClose={() => setToast({ message: '', type: 'success' })} 
+                />
+            )}
         </div>
     );
 }
