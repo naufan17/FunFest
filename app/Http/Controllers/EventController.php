@@ -9,6 +9,7 @@ use App\Models\EventCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class EventController extends Controller
@@ -22,13 +23,13 @@ class EventController extends Controller
 
     public function create()
     {
-        \Illuminate\Support\Facades\Gate::authorize('create', Event::class);
+        Gate::authorize('create', Event::class);
         return Inertia::render('Events/Create');
     }
 
     public function store(StoreEventRequest $request)
     {
-        \Illuminate\Support\Facades\Gate::authorize('create', Event::class);
+        Gate::authorize('create', Event::class);
 
         $validated = $request->validated();
         
@@ -72,13 +73,13 @@ class EventController extends Controller
 
     public function edit(Event $event)
     {
-        \Illuminate\Support\Facades\Gate::authorize('update', $event);
+        Gate::authorize('update', $event);
         return Inertia::render('Events/Edit', ['event' => $event]);
     }
 
     public function update(UpdateEventRequest $request, Event $event)
     {
-        \Illuminate\Support\Facades\Gate::authorize('update', $event);
+        Gate::authorize('update', $event);
         
         $validated = $request->validated();
         
@@ -100,7 +101,7 @@ class EventController extends Controller
 
     public function destroy(Event $event)
     {
-        \Illuminate\Support\Facades\Gate::authorize('delete', $event);
+        Gate::authorize('delete', $event);
         $event->delete();
         return redirect()->route('events.index')->with('success', 'Event deleted successfully.');
     }

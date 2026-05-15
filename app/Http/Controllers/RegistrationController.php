@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Event;
 use App\Models\Registration;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class RegistrationController extends Controller
 {
@@ -37,7 +38,7 @@ class RegistrationController extends Controller
     {
         // Only organizer or admin can update status/time
         $event = $registration->event;
-        \Illuminate\Support\Facades\Gate::authorize('update', $registration);
+        Gate::authorize('update', $registration);
 
         $validated = $request->validate([
             'status' => 'sometimes|in:registered,checked_in,finished',
