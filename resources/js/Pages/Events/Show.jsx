@@ -5,12 +5,15 @@ import { useState } from 'react';
 import ParticipantTable from '@/Components/ParticipantTable';
 import LeaderboardTable from '@/Components/LeaderboardTable';
 
-export default function Show({ auth, event, isOwner, isRegistered, registration }) {
+import ResultInputModal from '@/Components/ResultInputModal';
+
+export default function Show({ auth, event, participants, leaderboard, isOwner, isRegistered, registration }) {
     const isAdmin = auth.user?.role === 'admin';
     const [activeTab, setActiveTab] = useState('info'); // 'info', 'participants', 'leaderboard'
+    const [resultModal, setResultModal] = useState({ show: false, regId: null });
 
     const isOutdated = event.date < new Date().toISOString().split('T')[0];
-    const isFull = event.registrations.length >= event.max_participants;
+    const isFull = participants.total >= event.max_participants;
 
     const { post: joinEvent, processing: joining, errors: joinErrors } = useForm({ gender: '' });
     const { patch: updateRegistration, processing: updating } = useForm({ status: '', finish_time: '' });
@@ -30,13 +33,15 @@ export default function Show({ auth, event, isOwner, isRegistered, registration 
     };
 
     const handleResultInput = (regId) => {
-        const time = prompt("Enter finish time (e.g. 01:23:45):");
-        if (time) {
-            updateRegistration(route('registrations.update', regId), {
-                data: { status: 'finished', finish_time: time },
-                preserveScroll: true
-            });
-        }
+        setResultModal({ show: true, regId });
+    };
+
+    const confirmResult = (time) => {
+        updateRegistration(route('registrations.update', resultModal.regId), {
+            data: { status: 'finished', finish_time: time },
+            preserveScroll: true,
+            onSuccess: () => setResultModal({ show: false, regId: null })
+        });
     };
 
     return (
@@ -62,9 +67,9 @@ export default function Show({ auth, event, isOwner, isRegistered, registration 
                         <h2 className="text-4xl font-black italic tracking-tight text-[#0A1D37] leading-none">{event.title}</h2>
                     </div>
                     
-                    {(isOwner || isAdmin) && (
+                    {isOwner && (
                         <div className="flex gap-2">
-                            <Button as={Link} href={route('events.edit', event.id)} variant="white" size="sm">
+                            <Button as={Link} href={route('events.edit', event.id)} variant="white" size="lg">
                                 Edit Event
                             </Button>
                         </div>
@@ -113,7 +118,7 @@ export default function Show({ auth, event, isOwner, isRegistered, registration 
                                     <ul className="space-y-4">
                                         <li className="flex justify-between border-b border-gray-200 pb-2"><span className="text-gray-400">Status</span> <span className="font-bold text-green-600">Open</span></li>
                                         <li className="flex justify-between border-b border-gray-200 pb-2"><span className="text-gray-400">Closing Date</span> <span className="font-bold">{event.registration_end}</span></li>
-                                        <li className="flex justify-between border-b border-gray-200 pb-2"><span className="text-gray-400">Participants</span> <span className="font-bold">{event.registrations.length} / {event.max_participants}</span></li>
+                                        <li className="flex justify-between border-b border-gray-200 pb-2"><span className="text-gray-400">Participants</span> <span className="font-bold">{participants.total} / {event.max_participants}</span></li>
                                     </ul>
                                 </div>
                             </div>
@@ -122,7 +127,7 @@ export default function Show({ auth, event, isOwner, isRegistered, registration 
 
                     {activeTab === 'participants' && (
                         <ParticipantTable 
-                            registrations={event.registrations}
+                            participants={participants}
                             isOwner={isOwner}
                             isAdmin={isAdmin}
                             onStatusUpdate={handleStatusUpdate}
@@ -132,7 +137,7 @@ export default function Show({ auth, event, isOwner, isRegistered, registration 
                     )}
 
                     {activeTab === 'leaderboard' && (
-                        <LeaderboardTable registrations={event.registrations} />
+                        <LeaderboardTable leaderboard={leaderboard} />
                     )}
                 </div>
 
@@ -192,9 +197,9 @@ export default function Show({ auth, event, isOwner, isRegistered, registration 
                                     </div>
                                     <div className="flex items-center gap-2 text-[10px] uppercase font-black tracking-widest text-gray-500">
                                         {isOutdated ? (
-                                            <span className="text-red-400">Event is closed</span>
+                                            <span className="text-red-400 text-[16px] font-semibold">Event is closed</span>
                                         ) : isFull ? (
-                                            <span className="text-red-400">Event is full</span>
+                                            <span className="text-red-400 text-[16px] font-semibold">Event is full</span>
                                         ) : (
                                             <>
                                                 <span className="inline-block h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
@@ -208,6 +213,12 @@ export default function Show({ auth, event, isOwner, isRegistered, registration 
                     </div>
                 )}
             </div>
+            <ResultInputModal
+                show={resultModal.show}
+                onClose={() => setResultModal({ show: false, regId: null })}
+                onConfirm={confirmResult}
+                processing={updating}
+            />
         </AuthenticatedLayout>
     );
 }

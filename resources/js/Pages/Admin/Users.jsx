@@ -221,10 +221,10 @@ export default function Users({ auth, users }) {
                     </div>
 
                     <div className="flex justify-end gap-4 mt-10">
-                        <SecondaryButton onClick={closeModal} size="lg" type="button">
+                        <SecondaryButton onClick={closeModal} size="md" type="button">
                             Cancel
                         </SecondaryButton>
-                        <PrimaryButton type="submit" disabled={creating} size="lg" className="shadow-xl">
+                        <PrimaryButton type="submit" disabled={creating} size="md" className="shadow-xl">
                             {creating ? 'Creating...' : 'Create Account'}
                         </PrimaryButton>
                     </div>
@@ -248,10 +248,10 @@ export default function Users({ auth, users }) {
                     </p>
 
                     <div className="flex justify-end gap-4 mt-10">
-                        <SecondaryButton onClick={closeModal} size="lg" type="button">
+                        <SecondaryButton onClick={closeModal} size="md" type="button">
                             Cancel
                         </SecondaryButton>
-                        <DangerButton type="submit" disabled={deleting} size="lg">
+                        <DangerButton type="submit" disabled={deleting} size="md">
                             Permanently Delete
                         </DangerButton>
                     </div>
