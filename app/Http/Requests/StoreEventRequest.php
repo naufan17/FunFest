@@ -26,7 +26,7 @@ class StoreEventRequest extends FormRequest
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'distance' => 'required|string',
-            'date' => 'required|date',
+            'date' => 'required|date|after:today',
             'location' => 'required|string',
             'max_participants' => 'required|integer|min:1',
             'registration_start' => 'required|date',
@@ -36,7 +36,7 @@ class StoreEventRequest extends FormRequest
             'organizer_name' => 'required|string',
             'contact' => 'required|string',
             'categories' => 'required|array',
-            'banner_image' => 'nullable|image|max:2048', // 2MB max
+            'banner_image' => 'required|image|mimes:jpg,jpeg,png|max:2048', // 2MB max
         ];
     }
 }

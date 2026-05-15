@@ -2,6 +2,8 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Button from '@/Components/Button';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useState } from 'react';
+import ParticipantTable from '@/Components/ParticipantTable';
+import LeaderboardTable from '@/Components/LeaderboardTable';
 
 export default function Show({ auth, event, isOwner, isRegistered, registration }) {
     const isAdmin = auth.user?.role === 'admin';
@@ -9,11 +11,6 @@ export default function Show({ auth, event, isOwner, isRegistered, registration 
 
     const isOutdated = event.date < new Date().toISOString().split('T')[0];
     const isFull = event.registrations.length >= event.max_participants;
-
-    const maskName = (name) => {
-        if (isOwner || isAdmin) return name;
-        return name.split(' ').map(word => word.charAt(0) + '*'.repeat(Math.max(1, word.length - 1))).join(' ');
-    };
 
     const { post: joinEvent, processing: joining, errors: joinErrors } = useForm({ gender: '' });
     const { patch: updateRegistration, processing: updating } = useForm({ status: '', finish_time: '' });
@@ -124,80 +121,18 @@ export default function Show({ auth, event, isOwner, isRegistered, registration 
                     )}
 
                     {activeTab === 'participants' && (
-                        <div className="overflow-hidden rounded-3xl border border-gray-100 bg-white">
-                            <table className="w-full text-left">
-                                <thead className="bg-gray-50/50">
-                                    <tr>
-                                        <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Runner</th>
-                                        <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Gender</th>
-                                        <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Status</th>
-                                        {(isOwner || isAdmin) && <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-400 text-right">Actions</th>}
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-50">
-                                    {event.registrations.map(reg => (
-                                        <tr key={reg.id} className="hover:bg-gray-50/50 transition-colors">
-                                            <td className="px-6 py-6 font-bold text-[#0A1D37]">{maskName(reg.user.name)}</td>
-                                            <td className="px-6 py-6 text-sm text-gray-500 uppercase">{reg.gender}</td>
-                                            <td className="px-6 py-6">
-                                                <span className={`rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest ${
-                                                    reg.status === 'finished' ? 'bg-green-100 text-green-700' :
-                                                    reg.status === 'checked_in' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-[#FF5722]'
-                                                }`}>
-                                                    {reg.status.replace('_', ' ')}
-                                                </span>
-                                            </td>
-                                            {(isOwner || isAdmin) && (
-                                                <td className="px-6 py-6 text-right space-x-2">
-                                                    {reg.status === 'registered' && (
-                                                        <Button onClick={() => handleStatusUpdate(reg.id, 'checked_in')} variant="ghost" size="sm">
-                                                            Check-in
-                                                        </Button>
-                                                    )}
-                                                    {reg.status === 'checked_in' && (
-                                                        <Button onClick={() => handleResultInput(reg.id)} variant="ghost" size="sm" className="text-green-600">
-                                                            Input Result
-                                                        </Button>
-                                                    )}
-                                                </td>
-                                            )}
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                            {event.registrations.length === 0 && <p className="p-12 text-center text-gray-400 italic">No registrations yet.</p>}
-                        </div>
+                        <ParticipantTable 
+                            registrations={event.registrations}
+                            isOwner={isOwner}
+                            isAdmin={isAdmin}
+                            onStatusUpdate={handleStatusUpdate}
+                            onResultInput={handleResultInput}
+                            processing={updating}
+                        />
                     )}
 
                     {activeTab === 'leaderboard' && (
-                        <div className="space-y-8">
-                            <div className="grid gap-8 md:grid-cols-2">
-                                {['male', 'female'].map(gender => (
-                                    <div key={gender} className="rounded-3xl border border-gray-100 bg-white p-8">
-                                        <h4 className="mb-6 text-xl font-black italic tracking-tight uppercase text-[#0A1D37] border-b border-gray-50 pb-4">
-                                            {gender} LEADERBOARD
-                                        </h4>
-                                        <div className="space-y-4">
-                                            {event.registrations
-                                                .filter(r => r.gender === gender && r.status === 'finished')
-                                                .sort((a, b) => a.finish_time.localeCompare(b.finish_time))
-                                                .map((r, i) => (
-                                                    <div key={r.id} className="flex items-center justify-between">
-                                                        <div className="flex items-center gap-4">
-                                                            <span className="text-xl font-black italic text-gray-200">#{i + 1}</span>
-                                                            <span className="font-bold">{r.user.name}</span>
-                                                        </div>
-                                                        <span className="font-mono font-black text-[#FF5722]">{r.finish_time}</span>
-                                                    </div>
-                                                ))}
-                                            {event.registrations.filter(r => r.gender === gender && r.status === 'finished').length === 0 && (
-                                                <p className="text-gray-400 italic text-sm">No results yet.</p>
-                                            )}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
+                        <LeaderboardTable registrations={event.registrations} />
                     )}
                 </div>
 

@@ -26,7 +26,7 @@ class UpdateEventRequest extends FormRequest
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'distance' => 'required|string',
-            'date' => 'required|date',
+            'date' => 'required|date|after:today',
             'location' => 'required|string',
             'max_participants' => 'required|integer|min:1',
             'registration_start' => 'required|date',
@@ -35,7 +35,7 @@ class UpdateEventRequest extends FormRequest
             'cut_off_time' => 'required',
             'organizer_name' => 'required|string',
             'contact' => 'required|string',
-            'banner_image' => 'nullable|image|max:2048',
+            'banner_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ];
     }
 }

@@ -14,6 +14,13 @@ use Inertia\Inertia;
 
 class EventController extends Controller
 {
+    protected $eventService;
+
+    public function __construct(\App\Services\EventService $eventService)
+    {
+        $this->eventService = $eventService;
+    }
+
     public function index()
     {
         return Inertia::render('Events/Index', [
@@ -31,28 +38,7 @@ class EventController extends Controller
     {
         Gate::authorize('create', Event::class);
 
-        $validated = $request->validated();
-        
-        $bannerUrl = null;
-        if ($request->hasFile('banner_image')) {
-            $path = $request->file('banner_image')->store('events', 'public');
-            $bannerUrl = '/storage/' . $path;
-        }
-
-        DB::transaction(function () use ($validated, $request, $bannerUrl) {
-            $event = Event::create([
-                ...collect($validated)->except(['categories', 'banner_image'])->toArray(),
-                'banner_url' => $bannerUrl,
-                'created_by' => $request->user()->id,
-            ]);
-
-            foreach ($validated['categories'] as $gender) {
-                EventCategory::create([
-                    'event_id' => $event->id,
-                    'gender' => $gender,
-                ]);
-            }
-        });
+        $this->eventService->create($request->validated(), $request->user()->id);
 
         return redirect()->route('events.index')->with('success', 'Event created successfully.');
     }
@@ -81,20 +67,7 @@ class EventController extends Controller
     {
         Gate::authorize('update', $event);
         
-        $validated = $request->validated();
-        
-        $dataToUpdate = collect($validated)->except(['banner_image'])->toArray();
-
-        if ($request->hasFile('banner_image')) {
-            // Delete old banner if exists
-            if ($event->banner_url) {
-                Storage::disk('public')->delete(str_replace('/storage/', '', $event->banner_url));
-            }
-            $path = $request->file('banner_image')->store('events', 'public');
-            $dataToUpdate['banner_url'] = '/storage/' . $path;
-        }
-
-        $event->update($dataToUpdate);
+        $this->eventService->update($event, $request->validated());
 
         return redirect()->route('events.show', $event->id)->with('success', 'Event updated successfully.');
     }
@@ -102,7 +75,9 @@ class EventController extends Controller
     public function destroy(Event $event)
     {
         Gate::authorize('delete', $event);
-        $event->delete();
+        
+        $this->eventService->delete($event);
+
         return redirect()->route('events.index')->with('success', 'Event deleted successfully.');
     }
 }

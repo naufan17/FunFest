@@ -4,40 +4,31 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use App\Models\Registration;
+use App\Http\Requests\StoreRegistrationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
 class RegistrationController extends Controller
 {
-    public function store(Request $request, Event $event)
+    protected $registrationService;
+
+    public function __construct(\App\Services\RegistrationService $registrationService)
     {
-        $request->validate([
-            'gender' => 'required|in:male,female',
-        ]);
+        $this->registrationService = $registrationService;
+    }
 
-        $now = now()->format('Y-m-d');
-        if ($now < $event->registration_start || $now > $event->registration_end) {
-            return back()->withErrors(['error' => 'Registration for this event is currently closed.']);
+    public function store(StoreRegistrationRequest $request, Event $event)
+    {
+        try {
+            $this->registrationService->register($event, $request->user(), $request->validated());
+            return back()->with('success', 'You have been successfully registered for ' . $event->title);
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => $e->getMessage()]);
         }
-
-        if ($event->registrations()->count() >= $event->max_participants) {
-            return back()->withErrors(['error' => 'This event has reached its maximum participant limit.']);
-        }
-
-        Registration::create([
-            'user_id' => $request->user()->id,
-            'event_id' => $event->id,
-            'gender' => $request->gender,
-            'status' => 'registered',
-        ]);
-
-        return back()->with('success', 'You have been successfully registered for ' . $event->name);
     }
 
     public function update(Request $request, Registration $registration)
     {
-        // Only organizer or admin can update status/time
-        $event = $registration->event;
         Gate::authorize('update', $registration);
 
         $validated = $request->validate([
@@ -45,7 +36,7 @@ class RegistrationController extends Controller
             'finish_time' => 'nullable|string',
         ]);
 
-        $registration->update($validated);
+        $this->registrationService->update($registration, $validated);
 
         return back()->with('success', 'Registration updated successfully.');
     }
