@@ -36,7 +36,7 @@ class StoreEventRequest extends FormRequest
             'organizer_name' => 'required|string',
             'contact' => 'required|string',
             'categories' => 'required|array',
-            'banner_image' => 'required|image|mimes:jpg,jpeg,png|max:2048', // 2MB max
+            'banner_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048', // 2MB max
         ];
     }
 }

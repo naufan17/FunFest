@@ -15,7 +15,7 @@ export default function ParticipantTable({ participants, isOwner, isAdmin, onSta
                         <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Runner</th>
                         <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Gender</th>
                         <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Status</th>
-                        {isOwner && <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-400 text-right">Actions</th>}
+                        { (isOwner || isAdmin) && <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-400 text-right">Actions</th>}
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
@@ -31,7 +31,7 @@ export default function ParticipantTable({ participants, isOwner, isAdmin, onSta
                                     {reg.status.replace('_', ' ')}
                                 </span>
                             </td>
-                            {isOwner && (
+                            { (isOwner || isAdmin) && (
                                 <td className="px-6 py-6 text-right space-x-2">
                                     {reg.status === 'registered' && (
                                         <Button onClick={() => onStatusUpdate(reg.id, 'checked_in')} variant="ghost" size="sm">

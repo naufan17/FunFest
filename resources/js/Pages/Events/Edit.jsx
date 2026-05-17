@@ -162,7 +162,7 @@ export default function Edit({ event }) {
                     </div>
 
                     <div className="mt-12 flex justify-end">
-                        <PrimaryButton className="px-12 py-4" disabled={processing}>
+                        <PrimaryButton size="md" disabled={processing}>
                             Save Changes
                         </PrimaryButton>
                     </div>

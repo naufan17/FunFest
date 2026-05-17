@@ -6,6 +6,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use Illuminate\Http\Request;
+use Illuminate\Auth\AuthenticationException;
 use Inertia\Inertia;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -24,12 +25,18 @@ return Application::configure(basePath: dirname(__DIR__))
         //
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        $exceptions->respond(function ($request, $response) {
-            static $handling = false;
-            if ($handling) return $response;
+        $exceptions->render(function (AuthenticationException $e, Request $request) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Unauthenticated.'], 401);
+            }
 
-            if (in_array($response->getStatusCode(), [500, 503, 404, 403, 401, 429, 405]) && ! $request->expectsJson()) {
-                $handling = true;
+            return redirect()->guest(route('login'))
+                ->with('error', 'Please log in to access this page.');
+        });
+
+        $exceptions->respond(function ($request, $response) {
+            // Check for production environment or specific testing
+            if (!config('app.debug') && in_array($response->getStatusCode(), [500, 503, 404, 403, 401, 429, 405]) && ! $request->expectsJson()) {
                 return inertia('Error', ['status' => $response->getStatusCode()])
                     ->toResponse($request)
                     ->setStatusCode($response->getStatusCode());

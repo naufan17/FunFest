@@ -11,7 +11,11 @@ class EventService
     public function create(array $data, int $userId): Event
     {
         return DB::transaction(function () use ($data, $userId) {
-            $path = $data['banner_image']->store('events', 'public');
+            $bannerUrl = null;
+            if (isset($data['banner_image']) && $data['banner_image']) {
+                $path = $data['banner_image']->store('events', 'public');
+                $bannerUrl = Storage::url($path);
+            }
             
             $event = Event::create([
                 'title' => $data['title'],
@@ -26,7 +30,7 @@ class EventService
                 'registration_end' => $data['registration_end'],
                 'organizer_name' => $data['organizer_name'],
                 'contact' => $data['contact'],
-                'banner_url' => Storage::url($path),
+                'banner_url' => $bannerUrl,
                 'created_by' => $userId,
             ]);
 
