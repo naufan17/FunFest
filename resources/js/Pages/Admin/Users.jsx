@@ -96,7 +96,7 @@ export default function Users({ auth, users, filters }) {
         >
             <Head title="User Management" />
 
-            <div className="mb-6 bg-white p-10 rounded-3xl shadow-md">
+            <div className="mb-6 bg-white p-8 rounded-3xl shadow-md">
                 <div className="flex flex-col sm:flex-row gap-4 justify-between items-center w-full">
                     <div className="flex-1">
                         <TextInput

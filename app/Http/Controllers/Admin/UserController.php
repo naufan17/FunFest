@@ -5,15 +5,14 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class UserController extends Controller
 {
     public function index(Request $request)
     {
-        if (auth()->user()->role !== 'admin') {
-            abort(403);
-        }
+        Gate::authorize('viewAny', User::class);
 
         $search = $request->input('search');
         $role = $request->input('role');
@@ -40,9 +39,7 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
-        if (auth()->user()->role !== 'admin') {
-            abort(403);
-        }
+        Gate::authorize('create', User::class);
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -62,9 +59,7 @@ class UserController extends Controller
 
     public function updateRole(Request $request, User $user)
     {
-        if (auth()->user()->role !== 'admin') {
-            abort(403);
-        }
+        Gate::authorize('update', clone $user);
 
         $request->validate([
             'role' => 'required|in:admin,organizer,participant',
@@ -77,9 +72,7 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
-        if (auth()->user()->role !== 'admin') {
-            abort(403);
-        }
+        Gate::authorize('delete', clone $user);
 
         if ($user->id === auth()->id()) {
             return back()->withErrors(['error' => 'You cannot delete yourself.']);
