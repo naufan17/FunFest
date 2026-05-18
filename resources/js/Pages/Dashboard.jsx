@@ -129,22 +129,73 @@ export default function Dashboard({ auth, stats, recentActivity, myActivities = 
                         {myActivities.length > 0 ? (
                             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
                                 {myActivities.map((reg) => (
-                                    <div key={reg.id} className="group overflow-hidden rounded-[2.5rem] border border-gray-100 bg-white shadow-sm transition-all hover:shadow-2xl">
-                                        <div className="relative h-32 bg-gray-100">
-                                             <div className="absolute inset-0 bg-gradient-to-br from-[#0A1D37] to-[#FF5722] opacity-10"></div>
-                                             <div className="absolute top-6 left-6">
-                                                <span className={`rounded-full px-4 py-1 text-[9px] font-black uppercase tracking-[0.2em] shadow-sm ${
-                                                    reg.status === 'finished' ? 'bg-green-500 text-white' :
-                                                    reg.status === 'checked_in' ? 'bg-blue-500 text-white' : 'bg-[#FF5722] text-white'
-                                                }`}>
-                                                    {reg.status.replace('_', ' ')}
-                                                </span>
-                                             </div>
+                                    <div key={reg.id} className="group overflow-hidden rounded-[2.5rem] border border-gray-100 bg-white shadow-md transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
+                                        {/* Top Banner Area */}
+                                        <div className="relative h-40 bg-gray-100 overflow-hidden">
+                                            {reg.event.banner_url ? (
+                                                <img 
+                                                    src={`/storage/${reg.event.banner_url}`} 
+                                                    alt="" 
+                                                    className="h-full w-full object-cover transition-transform duration-550 group-hover:scale-105"
+                                                />
+                                            ) : (
+                                                <div className="h-full w-full bg-gradient-to-br from-[#0A1D37] to-[#1f3b5e] flex items-center justify-center text-white text-5xl font-black italic">
+                                                    RUN
+                                                </div>
+                                            )}
+                                            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                                            
+                                            {/* Status Badge */}
+                                            <div className="absolute top-6 left-6">
+                                               <span className={`rounded-full px-4 py-1.5 text-[9px] font-black uppercase tracking-[0.2em] shadow-md border ${
+                                                   reg.status === 'finished' ? 'bg-green-500 text-white border-green-400' :
+                                                   reg.status === 'checked_in' ? 'bg-blue-500 text-white border-blue-400' : 
+                                                   'bg-[#FF5722] text-white border-orange-400'
+                                               }`}>
+                                                   {reg.status.replace('_', ' ')}
+                                               </span>
+                                            </div>
+
+                                            {/* Distance Overlay */}
+                                            <div className="absolute bottom-4 right-6 bg-[#0A1D37] text-white font-black italic text-xs px-3.5 py-1.5 rounded-xl border border-white/10 shadow-lg">
+                                                {reg.event.distance} KM
+                                            </div>
                                         </div>
-                                        <div className="p-8">
-                                            <h4 className="text-2xl font-black italic tracking-tighter text-[#0A1D37] leading-none mb-2 group-hover:text-[#FF5722] transition-colors">{reg.event.title}</h4>
-                                            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-6">📅 {reg.event.date} • {reg.event.location}</p>
-                                            <Link href={route('events.show', reg.event_id)} className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] text-[#0A1D37] hover:gap-4 transition-all">
+
+                                        {/* Card Content */}
+                                        <div className="p-8 space-y-6">
+                                            <div>
+                                                <h4 className="text-2xl font-black italic tracking-tighter text-[#0A1D37] leading-none mb-2 group-hover:text-[#FF5722] transition-colors">{reg.event.title}</h4>
+                                                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
+                                                    <span>📅 {new Date(reg.event.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                                                    <span className="text-gray-300">•</span>
+                                                    <span className="truncate max-w-[150px]">📍 {reg.event.location}</span>
+                                                </p>
+                                            </div>
+
+                                            {/* Detail specifications */}
+                                            <div className="grid grid-cols-2 gap-4 py-4 border-y border-gray-50 text-left">
+                                                <div>
+                                                    <p className="text-[9px] font-black uppercase tracking-widest text-gray-400">Gender Selected</p>
+                                                    <p className="text-sm font-black text-[#0A1D37] capitalize">{reg.gender}</p>
+                                                </div>
+                                                <div>
+                                                    <p className="text-[9px] font-black uppercase tracking-widest text-gray-400">Race Start</p>
+                                                    <p className="text-sm font-black text-[#0A1D37]">{reg.event.race_start_time ? reg.event.race_start_time.substring(0, 5) : '06:00'}</p>
+                                                </div>
+                                                <div>
+                                                    <p className="text-[9px] font-black uppercase tracking-widest text-gray-400">Cut-off Time</p>
+                                                    <p className="text-sm font-black text-[#0A1D37]">{reg.event.cut_off_time ? reg.event.cut_off_time.substring(0, 5) : '02:00'} hrs</p>
+                                                </div>
+                                                <div>
+                                                    <p className="text-[9px] font-black uppercase tracking-widest text-gray-400">Finish Time</p>
+                                                    <p className={`text-sm font-black font-mono ${reg.finish_time ? 'text-green-600' : 'text-gray-400'}`}>
+                                                        {reg.finish_time || '--:--:--'}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <Link href={route('events.show', reg.event_id)} className="flex items-center justify-center gap-2 w-full py-3 bg-[#0A1D37] hover:bg-[#FF5722] text-white text-xs font-black uppercase tracking-[0.2em] rounded-2xl shadow-md transition-all duration-300">
                                                 RACE DETAILS <span>→</span>
                                             </Link>
                                         </div>
@@ -190,18 +241,79 @@ export default function Dashboard({ auth, stats, recentActivity, myActivities = 
 
                             {myEvents.length > 0 ? (
                                 <div className="space-y-6">
-                                    {myEvents.map((e) => (
-                                        <div key={e.id} className="flex items-center justify-between rounded-2xl bg-gray-50/50 p-6 transition-all hover:bg-gray-50">
-                                            <div>
-                                                <h4 className="font-black italic text-[#0A1D37]">{e.title}</h4>
-                                                <div className="mt-1 flex gap-4 text-[10px] font-bold uppercase tracking-widest text-gray-400">
-                                                    <span>📅 {e.date}</span>
-                                                    <span className="text-[#FF5722]">🏃 {e.registrations_count} Runners</span>
+                                    {myEvents.map((e) => {
+                                        const totalCap = e.max_participants || 0;
+                                        const regCount = e.registrations_count || 0;
+                                        const progressPercent = totalCap > 0 ? Math.min(100, Math.round((regCount / totalCap) * 100)) : 100;
+
+                                        return (
+                                            <div key={e.id} className="group rounded-[2rem] border border-gray-100 bg-gray-50/30 p-6 md:p-8 transition-all duration-300 hover:bg-white hover:shadow-xl space-y-6">
+                                                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                                                    <div className="flex items-center gap-4">
+                                                        {e.banner_url ? (
+                                                            <img 
+                                                                src={`/storage/${e.banner_url}`} 
+                                                                alt="" 
+                                                                className="h-12 w-20 object-cover rounded-xl shadow-sm border border-gray-200 shrink-0"
+                                                            />
+                                                        ) : (
+                                                            <div className="h-12 w-20 rounded-xl bg-gradient-to-br from-[#0A1D37] to-[#1f3b5e] flex items-center justify-center text-white text-xs font-black italic shrink-0">
+                                                                RUN
+                                                            </div>
+                                                        )}
+                                                        <div>
+                                                            <h4 className="text-lg font-black italic text-[#0A1D37] leading-tight group-hover:text-[#FF5722] transition-colors">{e.title}</h4>
+                                                            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1 flex items-center gap-1.5">
+                                                                <span>📅 {new Date(e.date).toLocaleDateString()}</span>
+                                                                <span>•</span>
+                                                                <span className="truncate max-w-[120px]">📍 {e.location}</span>
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex items-center gap-2.5 self-start lg:self-center shrink-0">
+                                                        <span className="font-black text-xs text-[#0A1D37] bg-white border border-gray-100 shadow-sm px-3.5 py-1.5 rounded-xl shrink-0">
+                                                            {e.distance} KM
+                                                        </span>
+                                                        <Link href={route('events.show', e.id)} className="rounded-xl border border-gray-200 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-widest text-[#0A1D37] hover:border-[#FF5722] hover:text-[#FF5722] transition-all">Manage</Link>
+                                                    </div>
                                                 </div>
+
+                                                {/* Event specifics grid */}
+                                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 py-4 border-t border-gray-100/70 text-left text-xs">
+                                                    <div>
+                                                        <p className="text-[9px] font-black uppercase tracking-widest text-gray-400">Race Start</p>
+                                                        <p className="font-bold text-[#0A1D37]">{e.race_start_time ? e.race_start_time.substring(0, 5) : '06:00'}</p>
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-[9px] font-black uppercase tracking-widest text-gray-400">Cut-off Time</p>
+                                                        <p className="font-bold text-[#0A1D37]">{e.cut_off_time ? e.cut_off_time.substring(0, 5) : '02:00'} hrs</p>
+                                                    </div>
+                                                    <div className="col-span-2 sm:col-span-1">
+                                                        <p className="text-[9px] font-black uppercase tracking-widest text-gray-400">Capacity Progression</p>
+                                                        <p className="font-bold text-[#0A1D37]">
+                                                            {regCount} / {totalCap || 'Unlimited'} Pax
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                {/* Progress Bar */}
+                                                {totalCap > 0 && (
+                                                    <div className="space-y-1.5">
+                                                        <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden shadow-inner">
+                                                            <div 
+                                                                className="bg-gradient-to-r from-[#0A1D37] to-[#FF5722] h-full rounded-full transition-all duration-500" 
+                                                                style={{ width: `${progressPercent}%` }}
+                                                            />
+                                                        </div>
+                                                        <div className="flex justify-between text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                                                            <span>Registration Fill Rate</span>
+                                                            <span className="text-[#FF5722]">{progressPercent}%</span>
+                                                        </div>
+                                                    </div>
+                                                )}
                                             </div>
-                                            <Link href={route('events.show', e.id)} className="rounded-xl border border-gray-200 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-widest text-[#0A1D37] hover:border-[#FF5722] hover:text-[#FF5722]">Manage</Link>
-                                        </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
                             ) : (
                                 <div className="py-20 text-center">
