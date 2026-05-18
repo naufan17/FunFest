@@ -37,6 +37,20 @@ class UserController extends Controller
         ]);
     }
 
+    public function show(User $user)
+    {
+        Gate::authorize('view', $user);
+
+        $user->load([
+            'createdEvents',
+            'registrations.event',
+        ]);
+
+        return Inertia::render('Admin/UserShow', [
+            'managedUser' => $user
+        ]);
+    }
+
     public function store(Request $request)
     {
         Gate::authorize('create', User::class);
