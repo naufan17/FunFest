@@ -9,14 +9,32 @@ use Inertia\Inertia;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         if (auth()->user()->role !== 'admin') {
             abort(403);
         }
 
+        $search = $request->input('search');
+        $role = $request->input('role');
+
+        $users = User::query()
+            ->when($search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                      ->orWhere('email', 'like', "%{$search}%");
+                });
+            })
+            ->when($role, function ($query, $role) {
+                $query->where('role', $role);
+            })
+            ->latest()
+            ->paginate(15)
+            ->withQueryString();
+
         return Inertia::render('Admin/Users', [
-            'users' => User::latest()->paginate(15)
+            'users' => $users,
+            'filters' => ['search' => $search, 'role' => $role]
         ]);
     }
 

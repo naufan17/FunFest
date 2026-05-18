@@ -1,6 +1,6 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
-import { useState } from 'react';
+import { Head, Link, useForm, router } from '@inertiajs/react';
+import { useState, useEffect, useCallback } from 'react';
 import Modal from '@/Components/Modal';
 import PrimaryButton from '@/Components/PrimaryButton';
 import SecondaryButton from '@/Components/SecondaryButton';
@@ -9,10 +9,12 @@ import TextInput from '@/Components/TextInput';
 import InputLabel from '@/Components/InputLabel';
 import InputError from '@/Components/InputError';
 
-export default function Users({ auth, users }) {
+export default function Users({ auth, users, filters }) {
     const [confirmingAdminCreation, setConfirmingAdminCreation] = useState(false);
     const [confirmingUserDeletion, setConfirmingUserDeletion] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
+    const [search, setSearch] = useState(filters?.search || '');
+    const [role, setRole] = useState(filters?.role || '');
 
     const { delete: deleteUser, processing: deleting } = useForm();
     
@@ -29,6 +31,24 @@ export default function Users({ auth, users }) {
         password: '',
         password_confirmation: '',
     });
+
+    // Debounce search and role filter
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            if (search !== (filters?.search || '') || role !== (filters?.role || '')) {
+                const params = {};
+                if (search) params.search = search;
+                if (role) params.role = role;
+                
+                router.get(
+                    route('admin.users.index'),
+                    params,
+                    { preserveState: true, preserveScroll: true, replace: true }
+                );
+            }
+        }, 300);
+        return () => clearTimeout(timeout);
+    }, [search, role]);
 
     const openCreateModal = () => {
         setConfirmingAdminCreation(true);
@@ -76,55 +96,89 @@ export default function Users({ auth, users }) {
         >
             <Head title="User Management" />
 
-            <div className="overflow-hidden rounded-[2.5rem] border border-gray-100 bg-white shadow-2xl">
+            <div className="mb-6 bg-white p-10 rounded-3xl shadow-md">
+                <div className="flex flex-col sm:flex-row gap-4 justify-between items-center w-full">
+                    <div className="flex-1">
+                        <TextInput
+                            type="text"
+                            className="w-full shadow-sm"
+                            placeholder="Search users by name or email..."
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                        />
+                    </div>
+                    <div className="sm:w-48">
+                        <select
+                            value={role}
+                            onChange={(e) => setRole(e.target.value)}
+                            className="w-full border-gray-200 focus:border-[#FF5722] focus:ring-[#FF5722] rounded-xl shadow-sm p-2.5"
+                        >
+                            <option value="">All Roles</option>
+                            <option value="admin">Admin</option>
+                            <option value="organizer">Organizer</option>
+                            <option value="participant">Participant</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div className="overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-2xl">
                 <table className="w-full text-left">
                     <thead className="bg-gray-50/50">
                         <tr>
-                            <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-gray-400">User Details</th>
-                            <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-gray-400">Current Role</th>
-                            <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-gray-400 text-right">Actions</th>
+                            <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-400">User Details</th>
+                            <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Current Role</th>
+                            <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-400 text-right">Actions</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-50">
-                        {users.data.map((user) => (
-                            <tr key={user.id} className="hover:bg-gray-50/50 transition-colors">
-                                <td className="px-8 py-8">
-                                    <p className="font-black italic text-lg text-[#0A1D37]">{user.name}</p>
-                                    <p className="text-sm text-gray-400">{user.email}</p>
-                                </td>
-                                <td className="px-8 py-8">
-                                    <span className={`rounded-full px-4 py-1 text-[10px] font-black uppercase tracking-widest ${
-                                        user.role === 'admin' ? 'bg-[#0A1D37] text-white shadow-lg shadow-blue-900/20' : 'bg-gray-100 text-gray-400'
-                                    }`}>
-                                        {user.role}
-                                    </span>
-                                </td>
-                                <td className="px-8 py-8 text-right">
-                                    {user.id !== auth.user.id && (
-                                        <button 
-                                            onClick={() => openDeleteModal(user)}
-                                            className="group relative p-3 rounded-xl text-red-400 hover:text-red-600 hover:bg-red-50 transition-all duration-300"
-                                            title="Delete User"
-                                        >
-                                            <svg 
-                                                className="w-5 h-5" 
-                                                fill="none" 
-                                                stroke="currentColor" 
-                                                viewBox="0 0 24 24"
+                        {users.data.length > 0 ? (
+                            users.data.map((user) => (
+                                <tr key={user.id} className="hover:bg-gray-50/50 transition-colors">
+                                    <td className="px-6 py-4">
+                                        <p className="font-black italic text-base text-[#0A1D37]">{user.name}</p>
+                                        <p className="text-xs text-gray-400">{user.email}</p>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <span className={`rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest ${
+                                            user.role === 'admin' ? 'bg-[#0A1D37] text-white shadow-md shadow-blue-900/20' : 'bg-gray-100 text-gray-400'
+                                        }`}>
+                                            {user.role}
+                                        </span>
+                                    </td>
+                                    <td className="px-6 py-4 text-right">
+                                        {user.id !== auth.user.id && (
+                                            <button 
+                                                onClick={() => openDeleteModal(user)}
+                                                className="group relative p-2 rounded-xl text-red-400 hover:text-red-600 hover:bg-red-50 transition-all duration-300"
+                                                title="Delete User"
                                             >
-                                                <path 
-                                                    strokeLinecap="round" 
-                                                    strokeLinejoin="round" 
-                                                    strokeWidth="2" 
-                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" 
-                                                />
-                                            </svg>
-                                            <span className="sr-only">Delete User</span>
-                                        </button>
-                                    )}
+                                                <svg 
+                                                    className="w-4 h-4" 
+                                                    fill="none" 
+                                                    stroke="currentColor" 
+                                                    viewBox="0 0 24 24"
+                                                >
+                                                    <path 
+                                                        strokeLinecap="round" 
+                                                        strokeLinejoin="round" 
+                                                        strokeWidth="2" 
+                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" 
+                                                    />
+                                                </svg>
+                                                <span className="sr-only">Delete User</span>
+                                            </button>
+                                        )}
+                                    </td>
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan="3" className="px-6 py-8 text-center text-gray-500 font-bold italic">
+                                    No users found matching "{search}".
                                 </td>
                             </tr>
-                        ))}
+                        )}
                     </tbody>
                 </table>
                 
