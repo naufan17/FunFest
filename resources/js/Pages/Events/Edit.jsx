@@ -10,10 +10,15 @@ import * as z from 'zod';
 import { useState } from 'react';
 
 const schema = z.object({
-    title: z.string().min(5, 'Title must be at least 5 characters'),
+    title: z.string().min(5, 'Title must be at least 5 characters').max(255, 'Title must not exceed 255 characters'),
     description: z.string().min(20, 'Description must be at least 20 characters'),
     distance: z.string().min(1, 'Distance is required'),
-    date: z.string().min(1, 'Race date is required'),
+    date: z.string().min(1, 'Race date is required').refine((val) => {
+        const selectedDate = new Date(val);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return selectedDate > today;
+    }, { message: 'Race date must be a future date' }),
     location: z.string().min(1, 'Location is required'),
     max_participants: z.coerce.number().min(1, 'Must have at least 1 participant'),
     registration_start: z.string().min(1, 'Registration start is required'),
@@ -23,6 +28,12 @@ const schema = z.object({
     organizer_name: z.string().min(1, 'Organizer name is required'),
     contact: z.string().min(1, 'Contact info is required'),
     banner_image: z.any().optional(),
+}).refine((data) => {
+    if (!data.registration_start || !data.registration_end) return true;
+    return new Date(data.registration_end) >= new Date(data.registration_start);
+}, {
+    message: 'Registration end date must be after or equal to start date',
+    path: ['registration_end'],
 });
 
 export default function Edit({ event }) {

@@ -15,12 +15,18 @@ export default function Show({ auth, event, participants, leaderboard, isOwner, 
     const isOutdated = event.date < new Date().toISOString().split('T')[0];
     const isFull = participants.total >= event.max_participants;
 
-    const { post: joinEvent, processing: joining, errors: joinErrors } = useForm({ gender: '' });
+    const { data, setData, post: joinEvent, processing: joining, errors: joinErrors } = useForm({ gender: '' });
     const { patch: updateRegistration, processing: updating } = useForm({ status: '', finish_time: '' });
 
     const handleJoin = (gender) => {
+        // Sync with backend validation: gender must be required and in:male,female
+        if (!gender || !['male', 'female'].includes(gender)) {
+            return; // Basic frontend validation
+        }
+        
         joinEvent(route('events.join', event.id), {
-            data: { gender },
+            data: { gender }, // Note: useForm doesn't naturally merge this, but Inertia's router does.
+            onBefore: () => setData('gender', gender),
             preserveScroll: true
         });
     };

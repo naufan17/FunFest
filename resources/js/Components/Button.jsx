@@ -26,7 +26,7 @@ export default function Button({
     const sizes = {
         sm: 'px-4 py-2 text-[10px]',
         md: 'px-6 py-3 text-xs',
-        lg: 'px-8 py-4 text-sm',
+        lg: 'px-8 py-3.5 text-sm',
     };
 
     const variantStyles = variants[variant] || variants.primary;

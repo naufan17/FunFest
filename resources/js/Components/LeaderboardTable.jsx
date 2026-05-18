@@ -15,7 +15,7 @@ export default function LeaderboardTable({ leaderboard }) {
                             {leaderboard[gender].map((r, i) => (
                                 <div key={r.id} className="flex items-center justify-between">
                                     <div className="flex items-center gap-4">
-                                        <span className="text-xl font-black italic text-gray-200">#{i + 1}</span>
+                                        <span className="text-xl font-black italic text-[#0A1D37]">#{i + 1}</span>
                                         <span className="font-bold">{r.user.name}</span>
                                     </div>
                                     <span className="font-mono font-black text-[#FF5722]">{r.finish_time}</span>

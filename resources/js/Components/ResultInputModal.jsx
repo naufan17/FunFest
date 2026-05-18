@@ -3,8 +3,11 @@ import Modal from '@/Components/Modal';
 import Button from '@/Components/Button';
 import TextInput from '@/Components/TextInput';
 import InputLabel from '@/Components/InputLabel';
+import InputError from '@/Components/InputError';
+import { usePage } from '@inertiajs/react';
 
 export default function ResultInputModal({ show, onClose, onConfirm, processing }) {
+    const { errors } = usePage().props;
     const [time, setTime] = useState('');
 
     const handleSubmit = (e) => {
@@ -36,6 +39,8 @@ export default function ResultInputModal({ show, onClose, onConfirm, processing 
                         required
                         autoFocus
                     />
+                    {/* Display validation error if it exists */}
+                    <InputError message={errors.finish_time} className="mt-2" />
                 </div>
 
                 <div className="mt-10 flex justify-end gap-4">
