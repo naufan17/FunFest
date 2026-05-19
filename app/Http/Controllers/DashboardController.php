@@ -35,7 +35,8 @@ class DashboardController extends Controller
                 'myEvents' => Event::where('created_by', $user->id)
                     ->withCount('registrations')
                     ->latest()
-                    ->get(),
+                    ->paginate(5)
+                    ->withQueryString(),
             ]);
         }
 

@@ -1,13 +1,13 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Button from '@/Components/Button';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, router } from '@inertiajs/react';
 import { useState } from 'react';
 import ParticipantTable from '@/Components/ParticipantTable';
 import LeaderboardTable from '@/Components/LeaderboardTable';
 
 import ResultInputModal from '@/Components/ResultInputModal';
 
-export default function Show({ auth, event, participants, leaderboard, isOwner, isRegistered, registration }) {
+export default function Show({ auth, event, participants, leaderboard, isOwner, isRegistered, registration, filters }) {
     const isAdmin = auth.user?.role === 'admin';
     const [activeTab, setActiveTab] = useState('info'); // 'info', 'participants', 'leaderboard'
     const [resultModal, setResultModal] = useState({ show: false, regId: null });
@@ -32,8 +32,7 @@ export default function Show({ auth, event, participants, leaderboard, isOwner, 
     };
 
     const handleStatusUpdate = (regId, status) => {
-        updateRegistration(route('registrations.update', regId), {
-            data: { status },
+        router.patch(route('registrations.update', regId), { status }, {
             preserveScroll: true
         });
     };
@@ -43,8 +42,7 @@ export default function Show({ auth, event, participants, leaderboard, isOwner, 
     };
 
     const confirmResult = (time) => {
-        updateRegistration(route('registrations.update', resultModal.regId), {
-            data: { status: 'finished', finish_time: time },
+        router.patch(route('registrations.update', resultModal.regId), { status: 'finished', finish_time: time }, {
             preserveScroll: true,
             onSuccess: () => setResultModal({ show: false, regId: null })
         });
@@ -133,7 +131,9 @@ export default function Show({ auth, event, participants, leaderboard, isOwner, 
 
                     {activeTab === 'participants' && (
                         <ParticipantTable 
+                            event={event}
                             participants={participants}
+                            filters={filters}
                             isOwner={isOwner}
                             isAdmin={isAdmin}
                             onStatusUpdate={handleStatusUpdate}
@@ -209,7 +209,7 @@ export default function Show({ auth, event, participants, leaderboard, isOwner, 
                                         ) : (
                                             <>
                                                 <span className="inline-block h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
-                                                {event.max_participants - event.registrations.length} slots remaining
+                                                {event.max_participants - (event.registrations?.length || 0)} slots remaining
                                             </>
                                         )}
                                     </div>

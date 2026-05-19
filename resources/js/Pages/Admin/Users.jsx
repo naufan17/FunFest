@@ -96,29 +96,48 @@ export default function Users({ auth, users, filters }) {
         >
             <Head title="User Management" />
 
-            <div className="mb-6 bg-white p-8 rounded-3xl shadow-md">
-                <div className="flex flex-col sm:flex-row gap-4 justify-between items-center w-full">
-                    <div className="flex-1">
-                        <TextInput
-                            type="text"
-                            className="w-full shadow-sm"
-                            placeholder="Search users by name or email..."
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                        />
-                    </div>
-                    <div className="sm:w-48">
-                        <select
-                            value={role}
-                            onChange={(e) => setRole(e.target.value)}
-                            className="w-full border-gray-200 focus:border-[#FF5722] focus:ring-[#FF5722] rounded-xl shadow-sm p-2.5"
+            {/* Search and Filters Bar */}
+            <div className="flex flex-col md:flex-row md:items-center gap-4 bg-white p-6 rounded-3xl border border-gray-100/70 shadow-sm mb-6">
+                {/* Search Input */}
+                <div className="flex-1 relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">🔍</span>
+                    <input 
+                        type="text" 
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        placeholder="Search users by name or email..."
+                        className="w-full bg-white border border-gray-200 rounded-2xl pl-10 pr-4 py-2.5 text-xs font-bold text-[#0A1D37] placeholder-gray-400 focus:outline-none focus:border-[#FF5722] focus:ring-1 focus:ring-[#FF5722] shadow-sm transition-all"
+                    />
+                </div>
+                {/* Filters Dropdown */}
+                <div className="flex flex-wrap items-center gap-3 shrink-0">
+                    <select
+                        value={role}
+                        onChange={(e) => setRole(e.target.value)}
+                        className="bg-white border border-gray-200 rounded-2xl px-4 py-2.5 text-xs font-black uppercase text-[#0A1D37] focus:outline-none focus:border-[#FF5722] shadow-sm transition-all"
+                    >
+                        <option value="">All Roles</option>
+                        <option value="admin">Admin</option>
+                        <option value="organizer">Organizer</option>
+                        <option value="participant">Participant</option>
+                    </select>
+
+                    {(search || role) && (
+                        <button
+                            onClick={() => {
+                                setSearch('');
+                                setRole('');
+                                router.get(
+                                    route('admin.users.index'),
+                                    {},
+                                    { preserveState: true, preserveScroll: true }
+                                );
+                            }}
+                            className="rounded-2xl bg-gray-100 hover:bg-gray-200 px-4 py-2.5 text-xs font-black uppercase tracking-widest text-gray-500 hover:text-gray-700 transition-all"
                         >
-                            <option value="">All Roles</option>
-                            <option value="admin">Admin</option>
-                            <option value="organizer">Organizer</option>
-                            <option value="participant">Participant</option>
-                        </select>
-                    </div>
+                            Reset
+                        </button>
+                    )}
                 </div>
             </div>
 

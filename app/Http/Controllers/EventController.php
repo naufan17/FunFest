@@ -21,10 +21,35 @@ class EventController extends Controller
         $this->eventService = $eventService;
     }
 
-    public function index()
+    public function index(Request $request)
     {
+        $search = $request->input('search');
+        $distance = $request->input('distance');
+
+        $events = Event::withCount('registrations')
+            ->when($search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('title', 'like', "%{$search}%")
+                      ->orWhere('location', 'like', "%{$search}%")
+                      ->orWhere('description', 'like', "%{$search}%");
+                });
+            })
+            ->when($distance, function ($query, $distance) {
+                $query->where('distance', $distance);
+            })
+            ->latest()
+            ->paginate(12)
+            ->withQueryString();
+
+        $distances = Event::select('distance')->distinct()->pluck('distance');
+
         return Inertia::render('Events/Index', [
-            'events' => Event::withCount('registrations')->latest()->paginate(12)
+            'events' => $events,
+            'filters' => [
+                'search' => $search,
+                'distance' => $distance,
+            ],
+            'distances' => $distances,
         ]);
     }
 
@@ -48,10 +73,26 @@ class EventController extends Controller
         $event->load(['creator', 'categories']);
         
         $userId = auth()->id();
+
+        $search = $request->input('search');
+        $status = $request->input('status');
+        $gender = $request->input('gender');
         
-        // Paginated participants
+        // Paginated participants with search & filters
         $participants = $event->registrations()
             ->with('user')
+            ->when($search, function ($query, $search) {
+                $query->whereHas('user', function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                      ->orWhere('email', 'like', "%{$search}%");
+                });
+            })
+            ->when($status, function ($query, $status) {
+                $query->where('status', $status);
+            })
+            ->when($gender, function ($query, $gender) {
+                $query->where('gender', $gender);
+            })
             ->latest()
             ->paginate(10, ['*'], 'participants_page')
             ->withQueryString();
@@ -76,6 +117,11 @@ class EventController extends Controller
         return Inertia::render('Events/Show', [
             'event' => $event,
             'participants' => $participants,
+            'filters' => [
+                'search' => $search,
+                'status' => $status,
+                'gender' => $gender,
+            ],
             'leaderboard' => [
                 'male' => $topMale,
                 'female' => $topFemale,

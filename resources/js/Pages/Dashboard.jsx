@@ -7,6 +7,9 @@ export default function Dashboard({ auth, stats, recentActivity, myActivities = 
     const isOrganizer = auth.user.role === 'organizer';
     const isParticipant = auth.user.role === 'participant';
 
+    const eventsData = myEvents?.data || (Array.isArray(myEvents) ? myEvents : []);
+    const eventsCount = myEvents?.total !== undefined ? myEvents.total : eventsData.length;
+
     return (
         <AuthenticatedLayout>
             <Head title="Dashboard" />
@@ -236,12 +239,12 @@ export default function Dashboard({ auth, stats, recentActivity, myActivities = 
                         <section className="rounded-[3rem] border border-gray-100 bg-white p-10 shadow-sm">
                             <div className="mb-10 flex items-center justify-between">
                                 <h3 className="text-xl font-black italic uppercase tracking-wider text-[#0A1D37]">Active Events</h3>
-                                <span className="rounded-full bg-gray-100 px-4 py-1 text-[10px] font-black text-gray-400">{myEvents.length} TOTAL</span>
+                                <span className="rounded-full bg-gray-100 px-4 py-1 text-[10px] font-black text-gray-400">{eventsCount} TOTAL</span>
                             </div>
 
-                            {myEvents.length > 0 ? (
+                            {eventsData.length > 0 ? (
                                 <div className="space-y-6">
-                                    {myEvents.map((e) => {
+                                    {eventsData.map((e) => {
                                         const totalCap = e.max_participants || 0;
                                         const regCount = e.registrations_count || 0;
                                         const progressPercent = totalCap > 0 ? Math.min(100, Math.round((regCount / totalCap) * 100)) : 100;
@@ -314,6 +317,36 @@ export default function Dashboard({ auth, stats, recentActivity, myActivities = 
                                             </div>
                                         );
                                     })}
+
+                                    {/* Pagination Links */}
+                                    {myEvents.links && myEvents.links.length > 3 && (
+                                        <div className="mt-8 flex flex-wrap justify-center gap-1.5 border-t border-gray-100 pt-6">
+                                            {myEvents.links.map((link, idx) => {
+                                                if (link.url === null) {
+                                                    return (
+                                                        <span 
+                                                            key={idx}
+                                                            className="px-3.5 py-2 rounded-xl text-[10px] font-black uppercase text-gray-300 bg-gray-50 border border-gray-100 cursor-not-allowed select-none"
+                                                            dangerouslySetInnerHTML={{ __html: link.label }}
+                                                        />
+                                                    );
+                                                }
+                                                return (
+                                                    <Link
+                                                        key={idx}
+                                                        href={link.url}
+                                                        preserveScroll
+                                                        className={`px-3.5 py-2 rounded-xl text-[10px] font-black uppercase border transition-all duration-300 ${
+                                                            link.active
+                                                                ? 'bg-[#FF5722] text-white border-[#FF5722] shadow-md shadow-orange-500/10'
+                                                                : 'bg-white text-[#0A1D37] border-gray-200 hover:border-[#FF5722] hover:text-[#FF5722]'
+                                                        }`}
+                                                        dangerouslySetInnerHTML={{ __html: link.label }}
+                                                    />
+                                                );
+                                            })}
+                                        </div>
+                                    )}
                                 </div>
                             ) : (
                                 <div className="py-20 text-center">
