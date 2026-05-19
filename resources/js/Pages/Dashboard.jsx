@@ -361,7 +361,7 @@ export default function Dashboard({ auth, stats, recentActivity, myActivities = 
                                 <h3 className="text-xs font-black uppercase tracking-[0.2em] text-orange-200">Management Tips</h3>
                                 <p className="mt-4 text-2xl font-black italic tracking-tight">ENGAGE YOUR COMMUNITY</p>
                                 <p className="mt-4 text-sm text-orange-50 font-medium leading-relaxed opacity-80">Check your participant lists regularly and ensure all race logistics are updated at least 48 hours before the start time.</p>
-                                <Button variant="ghost" size="sm" className="mt-8 bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm">
+                                <Button as={Link} href={route('guide')} variant="ghost" size="sm" className="mt-8 bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm">
                                     Read Guide
                                 </Button>
                             </div>

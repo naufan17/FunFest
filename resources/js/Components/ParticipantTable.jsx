@@ -64,16 +64,18 @@ export default function ParticipantTable({ event, participants, filters, isOwner
                 </div>
                 {/* Filters Dropdown */}
                 <div className="flex flex-wrap items-center gap-3 shrink-0">
-                    <select
-                        value={filters?.status || ''}
-                        onChange={(e) => handleFilterChange('status', e.target.value)}
-                        className="bg-white border border-gray-200 rounded-2xl px-4 py-2.5 text-xs font-black uppercase text-[#0A1D37] focus:outline-none focus:border-[#FF5722] shadow-sm transition-all"
-                    >
-                        <option value="">All Statuses</option>
-                        <option value="registered">Registered</option>
-                        <option value="checked_in">Checked In</option>
-                        <option value="finished">Finished</option>
-                    </select>
+                    {(isOwner || isAdmin) && (
+                        <select
+                            value={filters?.status || ''}
+                            onChange={(e) => handleFilterChange('status', e.target.value)}
+                            className="bg-white border border-gray-200 rounded-2xl px-4 py-2.5 text-xs font-black uppercase text-[#0A1D37] focus:outline-none focus:border-[#FF5722] shadow-sm transition-all"
+                        >
+                            <option value="">All Statuses</option>
+                            <option value="registered">Registered</option>
+                            <option value="checked_in">Checked In</option>
+                            <option value="finished">Finished</option>
+                        </select>
+                    )}
 
                     <select
                         value={filters?.gender || ''}
@@ -110,7 +112,7 @@ export default function ParticipantTable({ event, participants, filters, isOwner
                         <tr>
                             <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Runner</th>
                             <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Gender</th>
-                            <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Status</th>
+                            {(isOwner || isAdmin) && <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Status</th>}
                             <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Result</th>
                             {isOwner && <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-400 text-right">Actions</th>}
                         </tr>
@@ -120,14 +122,16 @@ export default function ParticipantTable({ event, participants, filters, isOwner
                             <tr key={reg.id} className="hover:bg-gray-50/50 transition-colors">
                                 <td className="px-6 py-6 font-bold text-[#0A1D37]">{maskName(reg.user.name)}</td>
                                 <td className="px-6 py-6 text-sm text-gray-500 uppercase">{reg.gender}</td>
-                                <td className="px-6 py-6">
-                                    <span className={`rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest ${
-                                        reg.status === 'finished' ? 'bg-green-100 text-green-700' :
-                                        reg.status === 'checked_in' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-[#FF5722]'
-                                    }`}>
-                                        {reg.status.replace('_', ' ')}
-                                    </span>
-                                </td>
+                                {(isOwner || isAdmin) && (
+                                    <td className="px-6 py-6">
+                                        <span className={`rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest ${
+                                            reg.status === 'finished' ? 'bg-green-100 text-green-700' :
+                                            reg.status === 'checked_in' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-[#FF5722]'
+                                        }`}>
+                                            {reg.status.replace('_', ' ')}
+                                        </span>
+                                    </td>
+                                )}
                                 <td className="px-6 py-6 font-mono font-bold text-sm">
                                     {reg.status === 'finished' ? (
                                         <span className="text-green-600 font-black">{reg.finish_time}</span>

@@ -27,6 +27,9 @@ Route::resource('events', EventController::class)->only(['index', 'show']);
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/guide', function () {
+        return Inertia::render('Guide');
+    })->name('guide');
 
     // Protected Event Routes
     Route::resource('events', EventController::class)->except(['index', 'show']);
