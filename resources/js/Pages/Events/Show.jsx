@@ -14,6 +14,7 @@ export default function Show({ auth, event, participants, leaderboard, isOwner, 
 
     const isOutdated = event.date < new Date().toISOString().split('T')[0];
     const isFull = participants.total >= event.max_participants;
+    const isParticipant = auth.user.role === 'participant';
 
     const { data, setData, post: joinEvent, processing: joining, errors: joinErrors } = useForm({ gender: '' });
     const { patch: updateRegistration, processing: updating } = useForm({ status: '', finish_time: '' });
@@ -23,7 +24,7 @@ export default function Show({ auth, event, participants, leaderboard, isOwner, 
         if (!gender || !['male', 'female'].includes(gender)) {
             return; // Basic frontend validation
         }
-        
+
         joinEvent(route('events.join', event.id), {
             data: { gender }, // Note: useForm doesn't naturally merge this, but Inertia's router does.
             onBefore: () => setData('gender', gender),
@@ -70,7 +71,7 @@ export default function Show({ auth, event, participants, leaderboard, isOwner, 
                         </div>
                         <h2 className="text-4xl font-black italic tracking-tight text-[#0A1D37] leading-none">{event.title}</h2>
                     </div>
-                    
+
                     {isOwner && (
                         <div className="flex gap-2">
                             <Button as={Link} href={route('events.edit', event.id)} variant="white" size="lg">
@@ -92,9 +93,8 @@ export default function Show({ auth, event, participants, leaderboard, isOwner, 
                             <button
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
-                                className={`px-8 py-4 text-xs font-black uppercase tracking-widest transition-all ${
-                                    activeTab === tab ? 'border-b-2 border-[#FF5722] text-[#FF5722]' : 'text-gray-400 hover:text-gray-600'
-                                }`}
+                                className={`px-8 py-4 text-xs font-black uppercase tracking-widest transition-all ${activeTab === tab ? 'border-b-2 border-[#FF5722] text-[#FF5722]' : 'text-gray-400 hover:text-gray-600'
+                                    }`}
                             >
                                 {tab}
                             </button>
@@ -130,7 +130,7 @@ export default function Show({ auth, event, participants, leaderboard, isOwner, 
                     )}
 
                     {activeTab === 'participants' && (
-                        <ParticipantTable 
+                        <ParticipantTable
                             event={event}
                             participants={participants}
                             filters={filters}
@@ -148,7 +148,7 @@ export default function Show({ auth, event, participants, leaderboard, isOwner, 
                 </div>
 
                 {/* Sidebar: Registration Card */}
-                {!isOwner && !isAdmin && (
+                {!isOwner && !isAdmin && isParticipant && (
                     <div className="w-full lg:w-96">
                         <div className="sticky top-24 overflow-hidden rounded-[2.5rem] bg-[#0A1D37] p-8 text-white shadow-2xl">
                             {isRegistered ? (

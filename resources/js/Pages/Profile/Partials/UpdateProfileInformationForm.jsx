@@ -102,15 +102,13 @@ export default function UpdateProfileInformation({
                                 type="button"
                                 id={`profile-gender-${g.id}`}
                                 onClick={() => setValue('gender', g.id, { shouldValidate: true })}
-                                className={`rounded-2xl border-2 p-4 text-left transition-all ${
-                                    selectedGender === g.id
-                                        ? 'border-[#FF5722] bg-orange-50'
-                                        : 'border-gray-100 bg-white hover:border-gray-200'
-                                }`}
+                                className={`rounded-2xl border-2 p-4 text-left transition-all ${selectedGender === g.id
+                                    ? 'border-[#FF5722] bg-orange-50'
+                                    : 'border-gray-100 bg-white hover:border-gray-200'
+                                    }`}
                             >
-                                <p className={`font-black italic uppercase tracking-wider text-xs flex items-center gap-1 ${
-                                    selectedGender === g.id ? 'text-[#FF5722]' : 'text-gray-400'
-                                }`}>
+                                <p className={`font-black italic uppercase tracking-wider text-xs flex items-center gap-1 ${selectedGender === g.id ? 'text-[#FF5722]' : 'text-gray-400'
+                                    }`}>
                                     <span className="text-base">{g.icon}</span> {g.label}
                                 </p>
                                 <p className="text-[10px] text-gray-500 mt-1">{g.desc}</p>
