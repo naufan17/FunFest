@@ -104,8 +104,39 @@ export default function Dashboard({ auth, stats, recentActivity, myActivities = 
             )}
 
             {/* --- PARTICIPANT DASHBOARD (RUNNER FLOW) --- */}
+
             {isParticipant && (
                 <div className="space-y-12">
+                    {/* Reminder Banner for Incoming Races */}
+                    {myActivities.length > 0 && (
+                        (() => {
+                            // Find the next upcoming race (by soonest event date in the future)
+                            const now = new Date();
+                            const upcomingRegs = myActivities.filter(reg => new Date(reg.event.date) > now && reg.status !== 'finished');
+                            if (!upcomingRegs.length) return null;
+                            const nextRace = upcomingRegs.reduce((soonest, reg) => {
+                                const raceDate = new Date(reg.event.date);
+                                return raceDate < new Date(soonest.event.date) ? reg : soonest;
+                            }, upcomingRegs[0]);
+                            return (
+                                <div className="mb-8 flex items-center gap-6 rounded-3xl bg-[#FF5722] text-white px-8 py-6 shadow-xl border-l-8 border-[#0A1D37] animate-pulse-slow">
+                                    <div className="text-5xl md:text-6xl font-black italic mr-4">🏁</div>
+                                    <div className="flex-1">
+                                        <div className="text-xs font-black uppercase tracking-widest text-orange-100 mb-1">Incoming Race Reminder</div>
+                                        <div className="text-lg md:text-2xl font-black italic tracking-tight">{nextRace.event.title}</div>
+                                        <div className="mt-1 text-sm md:text-base font-bold flex flex-wrap gap-4 items-center">
+                                            <span>📅 {new Date(nextRace.event.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                                            <span>⏰ {nextRace.event.race_start_time ? nextRace.event.race_start_time.substring(0, 5) : '06:00'}</span>
+                                            <span>📍 {nextRace.event.location}</span>
+                                            <span className="bg-white/20 rounded-full px-3 py-1 text-xs font-black ml-2">{nextRace.event.distance} KM</span>
+                                        </div>
+                                    </div>
+                                    <Button as={Link} href={route('events.show', nextRace.event_id)} size="md" variant="secondary" className=" ml-4">View Details</Button>
+                                </div>
+                            );
+                        })()
+                    )}
+
                     <div className="relative overflow-hidden rounded-[3rem] bg-gradient-to-r from-[#0A1D37] to-[#1a3a63] p-12 text-white shadow-2xl">
                         <div className="relative z-10 md:w-2/3">
                             <h2 className="text-sm font-black uppercase tracking-[0.3em] text-[#FF5722]">Welcome Back, Runner</h2>
@@ -114,9 +145,6 @@ export default function Dashboard({ auth, stats, recentActivity, myActivities = 
                             <div className="mt-10 flex gap-4">
                                 <Button as={Link} href={route('events.index')} size="lg" className="shadow-xl shadow-orange-500/40">
                                     Explore Races
-                                </Button>
-                                <Button variant="ghost" size="lg" className="border-2 border-white/20 bg-white/5 text-white hover:bg-white/10">
-                                    Training Log
                                 </Button>
                             </div>
                         </div>
@@ -364,16 +392,6 @@ export default function Dashboard({ auth, stats, recentActivity, myActivities = 
                                 <Button as={Link} href={route('guide')} variant="ghost" size="sm" className="mt-8 bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm">
                                     Read Guide
                                 </Button>
-                            </div>
-                            <div className="rounded-[3rem] border border-gray-100 bg-white p-10 shadow-sm">
-                                <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gray-400">Quick Actions</h3>
-                                <div className="mt-6 grid grid-cols-2 gap-4">
-                                    {['Export Data', 'Send Updates', 'Review Categories', 'Promote Race'].map(act => (
-                                        <button key={act} className="rounded-2xl border border-gray-50 bg-gray-50/50 p-6 text-left hover:bg-gray-50 transition-colors group">
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-[#0A1D37] group-hover:text-[#FF5722] transition-colors">{act}</p>
-                                        </button>
-                                    ))}
-                                </div>
                             </div>
                         </section>
                     </div>
