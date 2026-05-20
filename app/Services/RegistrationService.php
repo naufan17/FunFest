@@ -27,6 +27,10 @@ class RegistrationService
             throw new \Exception('The selected gender category is not supported by this event.');
         }
 
+        if ($user->gender !== $data['gender']) {
+            throw new \Exception('Your profile gender does not match this event category.');
+        }
+
         return Registration::create([
             'user_id' => $user->id,
             'event_id' => $event->id,

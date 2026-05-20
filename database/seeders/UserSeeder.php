@@ -32,6 +32,7 @@ class UserSeeder extends Seeder
             'email' => 'john@runfest.com',
             'password' => Hash::make('password'),
             'role' => 'participant',
+            'gender' => 'male',
         ]);
 
         User::create([
@@ -39,10 +40,12 @@ class UserSeeder extends Seeder
             'email' => 'jane@runfest.com',
             'password' => Hash::make('password'),
             'role' => 'participant',
+            'gender' => 'female',
         ]);
 
         User::factory(5)->create([
             'role' => 'organizer',
+            'gender' => null,
         ]);
 
         User::factory(50)->create([

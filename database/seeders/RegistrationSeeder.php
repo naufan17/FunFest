@@ -33,7 +33,7 @@ class RegistrationSeeder extends Seeder
                 Registration::create([
                     'user_id' => $user->id,
                     'event_id' => $event->id,
-                    'gender' => $index % 2 === 0 ? 'male' : 'female',
+                    'gender' => $user->gender,
                     'status' => $status,
                     'finish_time' => $finishTime,
                 ]);

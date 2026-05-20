@@ -15,6 +15,7 @@ const schema = z.object({
     password: z.string().min(8, 'Password must be at least 8 characters'),
     password_confirmation: z.string(),
     role: z.enum(['participant', 'organizer'], { errorMap: () => ({ message: 'Please select a role' }) }),
+    gender: z.enum(['male', 'female'], { errorMap: () => ({ message: 'Please select a gender' }) }),
 }).refine((data) => data.password === data.password_confirmation, {
     message: "Passwords don't match",
     path: ["password_confirmation"],
@@ -38,10 +39,12 @@ export default function Register() {
             password: '',
             password_confirmation: '',
             role: 'participant',
+            gender: '',
         }
     });
 
     const selectedRole = watch('role');
+    const selectedGender = watch('gender');
 
     const onSubmit = (data) => {
         setProcessing(true);
@@ -142,6 +145,36 @@ export default function Register() {
                         ))}
                     </div>
                     <InputError message={errors.role?.message || backendErrors.role} className="mt-2" />
+                </div>
+
+                <div className="mt-6">
+                    <InputLabel value="Gender" />
+                    <div className="mt-2 grid grid-cols-2 gap-4">
+                        {[
+                            { id: 'male', label: 'Male', icon: '♂', desc: 'Male category' },
+                            { id: 'female', label: 'Female', icon: '♀', desc: 'Female category' }
+                        ].map((g) => (
+                            <button
+                                key={g.id}
+                                type="button"
+                                id={`gender-${g.id}`}
+                                onClick={() => setValue('gender', g.id, { shouldValidate: true })}
+                                className={`rounded-2xl border-2 p-4 text-left transition-all ${
+                                    selectedGender === g.id
+                                    ? 'border-[#FF5722] bg-orange-50'
+                                    : 'border-gray-100 bg-white hover:border-gray-200'
+                                }`}
+                            >
+                                <p className={`font-black italic uppercase tracking-wider text-xs flex items-center gap-1 ${
+                                    selectedGender === g.id ? 'text-[#FF5722]' : 'text-gray-400'
+                                }`}>
+                                    <span className="text-base">{g.icon}</span> {g.label}
+                                </p>
+                                <p className="text-[10px] text-gray-500 mt-1">{g.desc}</p>
+                            </button>
+                        ))}
+                    </div>
+                    <InputError message={errors.gender?.message || backendErrors.gender} className="mt-2" />
                 </div>
 
                 <div className="mt-10 flex flex-col gap-4">

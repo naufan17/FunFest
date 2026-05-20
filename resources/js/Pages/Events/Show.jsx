@@ -183,23 +183,37 @@ export default function Show({ auth, event, participants, leaderboard, isOwner, 
                                         )}
                                     </div>
                                     <div className="space-y-4">
-                                        {event.categories.map(cat => (
-                                            <Button
-                                                key={cat.id}
-                                                onClick={() => {
-                                                    if (!auth.user) {
-                                                        window.location.href = route('login');
-                                                    } else {
-                                                        handleJoin(cat.gender);
-                                                    }
-                                                }}
-                                                disabled={joining || isOutdated || isFull}
-                                                variant={isOutdated || isFull ? 'ghost' : 'white'}
-                                                className="w-full py-4 text-lg"
-                                            >
-                                                JOIN AS {cat.gender}
-                                            </Button>
-                                        ))}
+                                        {event.categories.map(cat => {
+                                            const userGender = auth.user?.gender;
+                                            const isGenderMismatch = userGender && userGender !== cat.gender;
+                                            const isDisabled = joining || isOutdated || isFull || isGenderMismatch;
+
+                                            return (
+                                                <div key={cat.id} className="relative">
+                                                    <Button
+                                                        onClick={() => {
+                                                            if (!auth.user) {
+                                                                window.location.href = route('login');
+                                                            } else if (!isGenderMismatch) {
+                                                                handleJoin(cat.gender);
+                                                            }
+                                                        }}
+                                                        disabled={isDisabled}
+                                                        variant={isOutdated || isFull || isGenderMismatch ? 'ghost' : 'white'}
+                                                        className={`w-full py-4 text-lg transition-all ${isGenderMismatch ? 'opacity-40 cursor-not-allowed' : ''}`}
+                                                    >
+                                                        {cat.gender === 'male' ? '♂' : '♀'} JOIN AS {cat.gender.toUpperCase()}
+                                                    </Button>
+                                                    {isGenderMismatch && (
+                                                        <div className="mt-1 flex items-center justify-center gap-1">
+                                                            <span className="text-[10px] font-black uppercase tracking-widest text-red-400/70">
+                                                                {cat.gender} only — your profile is {userGender}
+                                                            </span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
                                     </div>
                                     <div className="flex items-center gap-2 text-[10px] uppercase font-black tracking-widest text-gray-500">
                                         {isOutdated ? (
