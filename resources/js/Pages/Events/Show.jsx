@@ -176,9 +176,9 @@ export default function Show({ auth, event, participants, leaderboard, isOwner, 
                                     <div>
                                         <h3 className="text-2xl font-black italic uppercase tracking-tight">READY TO JOIN?</h3>
                                         <p className="text-gray-400 mt-2">Select your category below</p>
-                                        {joinErrors?.error && (
+                                        {(joinErrors?.error || joinErrors?.gender) && (
                                             <div className="mt-4 rounded-xl bg-red-500/20 p-4 border border-red-500/50">
-                                                <p className="text-xs font-bold text-red-200">{joinErrors.error}</p>
+                                                <p className="text-xs font-bold text-red-200">{joinErrors.error || joinErrors.gender}</p>
                                             </div>
                                         )}
                                     </div>

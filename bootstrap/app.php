@@ -34,7 +34,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 ->with('error', 'Please log in to access this page.');
         });
 
-        $exceptions->respond(function ($request, $response) {
+        $exceptions->respond(function (Response $response, \Throwable $e, Request $request) {
             // Check for production environment or specific testing
             if (!config('app.debug') && in_array($response->getStatusCode(), [500, 503, 404, 403, 401, 429, 405]) && ! $request->expectsJson()) {
                 return inertia('Error', ['status' => $response->getStatusCode()])

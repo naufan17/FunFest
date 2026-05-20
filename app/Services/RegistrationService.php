@@ -23,6 +23,10 @@ class RegistrationService
             throw new \Exception('You are already registered for this event.');
         }
 
+        if (!$event->categories()->where('gender', $data['gender'])->exists()) {
+            throw new \Exception('The selected gender category is not supported by this event.');
+        }
+
         return Registration::create([
             'user_id' => $user->id,
             'event_id' => $event->id,
