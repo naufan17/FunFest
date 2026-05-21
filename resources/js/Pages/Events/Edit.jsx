@@ -3,11 +3,13 @@ import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
+import DatePicker from '@/Components/DatePicker';
 import { Head, router } from '@inertiajs/react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { DEFAULT_RUN_DISTANCES } from '@/Constants/appConstants';
 
 const schema = z.object({
     title: z.string().min(5, 'Title must be at least 5 characters').max(255, 'Title must not exceed 255 characters'),
@@ -40,9 +42,14 @@ export default function Edit({ event }) {
     const [processing, setProcessing] = useState(false);
     const [backendErrors, setBackendErrors] = useState({});
 
+    // Memoize minDate to prevent recalculation on every render
+    const minDate = useMemo(() => new Date().toISOString().split('T')[0], []);
+
     const {
         register,
         handleSubmit,
+        setValue,
+        watch,
         formState: { errors },
     } = useForm({
         resolver: zodResolver(schema),
@@ -119,13 +126,26 @@ export default function Edit({ event }) {
                         
                         <div>
                             <InputLabel value="Distance" />
-                            <TextInput className="mt-1 block w-full" {...register('distance')} />
+                            <select 
+                                className="mt-1 block w-full rounded-xl border-gray-200 focus:border-[#FF5722] focus:ring-[#FF5722]"
+                                {...register('distance')}
+                            >
+                                <option value="">-- Select a distance --</option>
+                                {DEFAULT_RUN_DISTANCES.map((dist) => (
+                                    <option key={dist} value={dist}>{dist}</option>
+                                ))}
+                            </select>
                             <InputError message={errors.distance?.message || backendErrors.distance} className="mt-2" />
+                            <p className="text-xs text-gray-400 mt-2">💡 Select from predefined distances</p>
                         </div>
                         <div>
-                            <InputLabel value="Race Date" />
-                            <TextInput type="date" className="mt-1 block w-full" {...register('date')} />
-                            <InputError message={errors.date?.message || backendErrors.date} className="mt-2" />
+                            <DatePicker
+                                label="Race Date"
+                                value={watch('date') || ''}
+                                onChange={(value) => setValue('date', value, { shouldValidate: true })}
+                                error={errors.date?.message || backendErrors.date}
+                                minDate={minDate}
+                            />
                         </div>
                         <div>
                             <InputLabel value="Location" />
@@ -139,14 +159,22 @@ export default function Edit({ event }) {
                         </div>
                         
                         <div>
-                            <InputLabel value="Registration Start" />
-                            <TextInput type="date" className="mt-1 block w-full" {...register('registration_start')} />
-                            <InputError message={errors.registration_start?.message || backendErrors.registration_start} className="mt-2" />
+                            <DatePicker
+                                label="Registration Start"
+                                value={watch('registration_start') || ''}
+                                onChange={(value) => setValue('registration_start', value, { shouldValidate: true })}
+                                error={errors.registration_start?.message || backendErrors.registration_start}
+                                minDate={minDate}
+                            />
                         </div>
                         <div>
-                            <InputLabel value="Registration End" />
-                            <TextInput type="date" className="mt-1 block w-full" {...register('registration_end')} />
-                            <InputError message={errors.registration_end?.message || backendErrors.registration_end} className="mt-2" />
+                            <DatePicker
+                                label="Registration End"
+                                value={watch('registration_end') || ''}
+                                onChange={(value) => setValue('registration_end', value, { shouldValidate: true })}
+                                error={errors.registration_end?.message || backendErrors.registration_end}
+                                minDate={watch('registration_start') || minDate}
+                            />
                         </div>
 
                         <div>

@@ -8,6 +8,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use App\Models\User;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -53,7 +54,8 @@ class ProfileController extends Controller
 
         Auth::logout();
 
-        $user->delete();
+        // Use the static destroy method to avoid instance delete signature issues
+        User::destroy($user->id);
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();

@@ -3,11 +3,13 @@ import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
+import DatePicker from '@/Components/DatePicker';
 import { Head, router } from '@inertiajs/react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { DEFAULT_RUN_DISTANCES } from '@/Constants/appConstants';
 
 const schema = z.object({
     title: z.string().min(5, 'Title must be at least 5 characters').max(255, 'Title must not exceed 255 characters'),
@@ -41,6 +43,9 @@ export default function Create() {
     const [processing, setProcessing] = useState(false);
     const [backendErrors, setBackendErrors] = useState({});
 
+    // Memoize minDate to prevent recalculation on every render
+    const minDate = useMemo(() => new Date().toISOString().split('T')[0], []);
+
     const {
         register,
         handleSubmit,
@@ -50,6 +55,18 @@ export default function Create() {
     } = useForm({
         resolver: zodResolver(schema),
         defaultValues: {
+            title: '',
+            description: '',
+            distance: '',
+            date: '',
+            location: '',
+            max_participants: '',
+            registration_start: '',
+            registration_end: '',
+            race_start_time: '',
+            cut_off_time: '',
+            organizer_name: '',
+            contact: '',
             categories: [],
         }
     });
@@ -126,14 +143,28 @@ export default function Create() {
                         <div className="space-y-6">
                             <h3 className="text-sm font-black uppercase tracking-widest text-[#FF5722]">Race Logistics</h3>
                             <div>
-                                <InputLabel htmlFor="distance" value="Distance (e.g. 5K, 10K, Marathon)" />
-                                <TextInput id="distance" className="mt-1 block w-full" {...register('distance')} />
+                                <InputLabel htmlFor="distance" value="Distance" />
+                                <select 
+                                    id="distance" 
+                                    className="mt-1 block w-full rounded-xl border-gray-200 focus:border-[#FF5722] focus:ring-[#FF5722]"
+                                    {...register('distance')}
+                                >
+                                    <option value="">-- Select or enter custom distance --</option>
+                                    {DEFAULT_RUN_DISTANCES.map((dist) => (
+                                        <option key={dist} value={dist}>{dist}</option>
+                                    ))}
+                                </select>
                                 <InputError message={errors.distance?.message || backendErrors.distance} className="mt-2" />
+                                <p className="text-xs text-gray-400 mt-2">💡 Select from common distances or leave blank to enter a custom one</p>
                             </div>
                             <div>
-                                <InputLabel htmlFor="date" value="Race Date" />
-                                <TextInput id="date" type="date" className="mt-1 block w-full" {...register('date')} />
-                                <InputError message={errors.date?.message || backendErrors.date} className="mt-2" />
+                                <DatePicker
+                                    label="Race Date"
+                                    value={watch('date') || ''}
+                                    onChange={(value) => setValue('date', value, { shouldValidate: true })}
+                                    error={errors.date?.message || backendErrors.date}
+                                    minDate={minDate}
+                                />
                             </div>
                             <div>
                                 <InputLabel htmlFor="location" value="Location" />
@@ -168,14 +199,22 @@ export default function Create() {
                             <h3 className="text-sm font-black uppercase tracking-widest text-[#FF5722]">Registration Window</h3>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <InputLabel value="Starts" />
-                                    <TextInput type="date" className="mt-1 block w-full" {...register('registration_start')} />
-                                    <InputError message={errors.registration_start?.message || backendErrors.registration_start} className="mt-2" />
+                                    <DatePicker
+                                        label="Registration Starts"
+                                        value={watch('registration_start') || ''}
+                                        onChange={(value) => setValue('registration_start', value, { shouldValidate: true })}
+                                        error={errors.registration_start?.message || backendErrors.registration_start}
+                                        minDate={minDate}
+                                    />
                                 </div>
                                 <div>
-                                    <InputLabel value="Ends" />
-                                    <TextInput type="date" className="mt-1 block w-full" {...register('registration_end')} />
-                                    <InputError message={errors.registration_end?.message || backendErrors.registration_end} className="mt-2" />
+                                    <DatePicker
+                                        label="Registration Ends"
+                                        value={watch('registration_end') || ''}
+                                        onChange={(value) => setValue('registration_end', value, { shouldValidate: true })}
+                                        error={errors.registration_end?.message || backendErrors.registration_end}
+                                        minDate={watch('registration_start') || minDate}
+                                    />
                                 </div>
                             </div>
                         </div>
