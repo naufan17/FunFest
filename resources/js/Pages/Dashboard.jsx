@@ -1,6 +1,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
 import Button from '@/Components/Button';
+import { calculateRankings, getRoleBadge } from '@/Utils/rankingUtils';
 
 export default function Dashboard({ auth, stats, recentActivity, myActivities = [], myEvents = [] }) {
     const isAdmin = auth.user.role === 'admin';
@@ -104,7 +105,6 @@ export default function Dashboard({ auth, stats, recentActivity, myActivities = 
             )}
 
             {/* --- PARTICIPANT DASHBOARD (RUNNER FLOW) --- */}
-
             {isParticipant && (
                 <div className="space-y-12">
                     {/* Reminder Banner for Incoming Races */}
@@ -128,7 +128,7 @@ export default function Dashboard({ auth, stats, recentActivity, myActivities = 
                                             <span>📅 {new Date(nextRace.event.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                                             <span>⏰ {nextRace.event.race_start_time ? nextRace.event.race_start_time.substring(0, 5) : '06:00'}</span>
                                             <span>📍 {nextRace.event.location}</span>
-                                            <span className="bg-white/20 rounded-full px-3 py-1 text-xs font-black ml-2">{nextRace.event.distance} KM</span>
+                                            <span className="bg-white/20 rounded-full px-3 py-1 text-xs font-black ml-2">{nextRace.event.distance}</span>
                                         </div>
                                     </div>
                                     <Button as={Link} href={route('events.show', nextRace.event_id)} size="md" variant="secondary" className=" ml-4">View Details</Button>
@@ -159,7 +159,7 @@ export default function Dashboard({ auth, stats, recentActivity, myActivities = 
                         
                         {myActivities.length > 0 ? (
                             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-                                {myActivities.map((reg) => (
+                                {calculateRankings(myActivities).map((reg) => (
                                     <div key={reg.id} className="group overflow-hidden rounded-[2.5rem] border border-gray-100 bg-white shadow-md transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
                                         {/* Top Banner Area */}
                                         <div className="relative h-40 bg-gray-100 overflow-hidden">
@@ -177,7 +177,7 @@ export default function Dashboard({ auth, stats, recentActivity, myActivities = 
                                             <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                                             
                                             {/* Status Badge */}
-                                            <div className="absolute top-6 left-6">
+                                            <div className="absolute top-6 left-6 flex flex-col gap-2">
                                                <span className={`rounded-full px-4 py-1.5 text-[9px] font-black uppercase tracking-[0.2em] shadow-md border ${
                                                    reg.status === 'finished' ? 'bg-green-500 text-white border-green-400' :
                                                    reg.status === 'checked_in' ? 'bg-blue-500 text-white border-blue-400' : 
@@ -185,11 +185,16 @@ export default function Dashboard({ auth, stats, recentActivity, myActivities = 
                                                }`}>
                                                    {reg.status.replace('_', ' ')}
                                                </span>
+                                               {reg.status === 'finished' && (
+                                                   <span className="rounded-full bg-white text-[#0A1D37] px-3 py-1 text-[9px] font-black uppercase tracking-[0.15em] shadow-md">
+                                                       {reg.eventRole}
+                                                   </span>
+                                               )}
                                             </div>
 
                                             {/* Distance Overlay */}
                                             <div className="absolute bottom-4 right-6 bg-[#0A1D37] text-white font-black italic text-xs px-3.5 py-1.5 rounded-xl border border-white/10 shadow-lg">
-                                                {reg.event.distance} KM
+                                                {reg.event.distance}
                                             </div>
                                         </div>
 
@@ -211,19 +216,20 @@ export default function Dashboard({ auth, stats, recentActivity, myActivities = 
                                                     <p className="text-sm font-black text-[#0A1D37] capitalize">{reg.gender}</p>
                                                 </div>
                                                 <div>
-                                                    <p className="text-[9px] font-black uppercase tracking-widest text-gray-400">Race Start</p>
-                                                    <p className="text-sm font-black text-[#0A1D37]">{reg.event.race_start_time ? reg.event.race_start_time.substring(0, 5) : '06:00'}</p>
-                                                </div>
-                                                <div>
-                                                    <p className="text-[9px] font-black uppercase tracking-widest text-gray-400">Cut-off Time</p>
-                                                    <p className="text-sm font-black text-[#0A1D37]">{reg.event.cut_off_time ? reg.event.cut_off_time.substring(0, 5) : '02:00'} hrs</p>
-                                                </div>
-                                                <div>
                                                     <p className="text-[9px] font-black uppercase tracking-widest text-gray-400">Finish Time</p>
                                                     <p className={`text-sm font-black font-mono ${reg.finish_time ? 'text-green-600' : 'text-gray-400'}`}>
                                                         {reg.finish_time || '--:--:--'}
                                                     </p>
                                                 </div>
+                                                {reg.status === 'finished' && reg.ranking && (
+                                                    <div className="col-span-2">
+                                                        <p className="text-[9px] font-black uppercase tracking-widest text-gray-400">Overall Ranking</p>
+                                                        <p className="text-lg font-black text-[#FF5722] flex items-center gap-2">
+                                                            <span>{getRoleBadge(reg.ranking)}</span>
+                                                            <span>#{reg.ranking}</span>
+                                                        </p>
+                                                    </div>
+                                                )}
                                             </div>
 
                                             <Link href={route('events.show', reg.event_id)} className="flex items-center justify-center gap-2 w-full py-3 bg-[#0A1D37] hover:bg-[#FF5722] text-white text-xs font-black uppercase tracking-[0.2em] rounded-2xl shadow-md transition-all duration-300">

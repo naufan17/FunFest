@@ -1,6 +1,7 @@
 import { Link, router } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
 import Button from '@/Components/Button';
+import { calculateRankings, getRoleBadge } from '@/Utils/rankingUtils';
 
 export default function ParticipantTable({ event, participants, filters, isOwner, isAdmin, onStatusUpdate, onResultInput }) {
     const [searchVal, setSearchVal] = useState(filters?.search || '');
@@ -114,11 +115,12 @@ export default function ParticipantTable({ event, participants, filters, isOwner
                             <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Gender</th>
                             {(isOwner || isAdmin) && <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Status</th>}
                             <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Result</th>
+                            <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Place</th>
                             {isOwner && <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-400 text-right">Actions</th>}
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-50">
-                        {participants.data.map(reg => (
+                        {calculateRankings(participants.data).map(reg => (
                             <tr key={reg.id} className="hover:bg-gray-50/50 transition-colors">
                                 <td className="px-6 py-6 font-bold text-[#0A1D37]">{maskName(reg.user.name)}</td>
                                 <td className="px-6 py-6 text-sm text-gray-500 uppercase">{reg.gender}</td>
@@ -137,6 +139,16 @@ export default function ParticipantTable({ event, participants, filters, isOwner
                                         <span className="text-green-600 font-black">{reg.finish_time}</span>
                                     ) : (
                                         <span className="text-gray-300">--:--:--</span>
+                                    )}
+                                </td>
+                                <td className="px-6 py-6">
+                                    {reg.status === 'finished' ? (
+                                        <span className="inline-flex items-center gap-2 text-sm font-black text-[#FF5722]">
+                                            <span>{getRoleBadge(reg.ranking)}</span>
+                                            <span>{reg.eventRole}</span>
+                                        </span>
+                                    ) : (
+                                        <span className="text-gray-300 text-xs">Pending</span>
                                     )}
                                 </td>
                                 {isOwner && (

@@ -90,34 +90,35 @@ export default function UpdateProfileInformation({
                     <InputError className="mt-2" message={errors.email?.message || backendErrors.email} />
                 </div>
 
-                <div>
-                    <InputLabel value="Gender" className="text-[10px] font-black uppercase tracking-widest text-gray-400" />
-                    <div className="mt-2 grid grid-cols-2 gap-4">
-                        {[
-                            { id: 'male', label: 'Male', icon: '♂', desc: 'Male category' },
-                            { id: 'female', label: 'Female', icon: '♀', desc: 'Female category' },
-                        ].map((g) => (
-                            <button
-                                key={g.id}
-                                type="button"
-                                id={`profile-gender-${g.id}`}
-                                onClick={() => setValue('gender', g.id, { shouldValidate: true })}
-                                className={`rounded-2xl border-2 p-4 text-left transition-all ${selectedGender === g.id
-                                    ? 'border-[#FF5722] bg-orange-50'
-                                    : 'border-gray-100 bg-white hover:border-gray-200'
-                                    }`}
-                            >
-                                <p className={`font-black italic uppercase tracking-wider text-xs flex items-center gap-1 ${selectedGender === g.id ? 'text-[#FF5722]' : 'text-gray-400'
-                                    }`}>
-                                    <span className="text-base">{g.icon}</span> {g.label}
-                                </p>
-                                <p className="text-[10px] text-gray-500 mt-1">{g.desc}</p>
-                            </button>
-                        ))}
+                {user.role === 'customer' && (
+                    <div>
+                        <InputLabel value="Gender" className="text-[10px] font-black uppercase tracking-widest text-gray-400" />
+                        <div className="mt-2 grid grid-cols-2 gap-4">
+                            {[
+                                { id: 'male', label: 'Male', icon: '♂', desc: 'Male category' },
+                                { id: 'female', label: 'Female', icon: '♀', desc: 'Female category' },
+                            ].map((g) => (
+                                <button
+                                    key={g.id}
+                                    type="button"
+                                    id={`profile-gender-${g.id}`}
+                                    onClick={() => setValue('gender', g.id, { shouldValidate: true })}
+                                    className={`rounded-2xl border-2 p-4 text-left transition-all ${selectedGender === g.id
+                                        ? 'border-[#FF5722] bg-orange-50'
+                                        : 'border-gray-100 bg-white hover:border-gray-200'
+                                        }`}
+                                >
+                                    <p className={`font-black italic uppercase tracking-wider text-xs flex items-center gap-1 ${selectedGender === g.id ? 'text-[#FF5722]' : 'text-gray-400'
+                                        }`}>
+                                        <span className="text-base">{g.icon}</span> {g.label}
+                                    </p>
+                                    <p className="text-[10px] text-gray-500 mt-1">{g.desc}</p>
+                                </button>
+                            ))}
+                        </div>
+                        <InputError className="mt-2" message={errors.gender?.message || backendErrors.gender} />
                     </div>
-                    <InputError className="mt-2" message={errors.gender?.message || backendErrors.gender} />
-                </div>
-
+                )}
                 {mustVerifyEmail && user.email_verified_at === null && (
                     <div className="rounded-2xl bg-orange-50 p-6 border border-orange-100">
                         <p className="text-sm font-bold text-[#FF5722]">

@@ -104,12 +104,12 @@ export default function Create() {
                                 <textarea 
                                     id="description" 
                                     className="mt-1 block w-full rounded-xl border-gray-200 focus:border-[#FF5722] focus:ring-[#FF5722]" 
-                                    rows="4" 
+                                    rows="8" 
                                     {...register('description')}
                                 ></textarea>
                                 <InputError message={errors.description?.message || backendErrors.description} className="mt-2" />
                             </div>
-                            <div>
+                            <div className="w-fit">
                                 <InputLabel htmlFor="banner_image" value="Event Banner Image (Optional)" />
                                 <input 
                                     id="banner_image" 

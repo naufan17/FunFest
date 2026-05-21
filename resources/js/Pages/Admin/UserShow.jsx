@@ -212,7 +212,6 @@ export default function UserShow({ auth, managedUser }) {
                                             <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-gray-400">Event Title</th>
                                             <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-gray-400">Distance</th>
                                             <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-gray-400">Location</th>
-                                            <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-gray-400">Race Times</th>
                                             <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-gray-400">Gender</th>
                                             <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-gray-400">Registration Status</th>
                                             <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-gray-400">Finish Time</th>
@@ -245,10 +244,6 @@ export default function UserShow({ auth, managedUser }) {
                                                 </td>
                                                 <td className="px-8 py-6">
                                                     <span className="text-sm font-semibold text-gray-600 truncate max-w-[150px] inline-block">📍 {reg.event.location}</span>
-                                                </td>
-                                                <td className="px-8 py-6 text-xs text-gray-500">
-                                                    <div>Start: <span className="font-bold text-[#0A1D37]">{reg.event.race_start_time ? reg.event.race_start_time.substring(0, 5) : '06:00'}</span></div>
-                                                    <div>Cut-off: <span className="font-bold text-[#0A1D37]">{reg.event.cut_off_time ? reg.event.cut_off_time.substring(0, 5) : '02:00'} hrs</span></div>
                                                 </td>
                                                 <td className="px-8 py-6">
                                                     <span className="text-sm font-semibold text-gray-600 capitalize">{reg.gender}</span>
@@ -286,7 +281,6 @@ export default function UserShow({ auth, managedUser }) {
                                             <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-gray-400">Event Details</th>
                                             <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-gray-400">Distance</th>
                                             <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-gray-400">Location</th>
-                                            <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-gray-400">Race Times</th>
                                             <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-gray-400">Max Participants</th>
                                         </tr>
                                     </thead>
@@ -317,10 +311,6 @@ export default function UserShow({ auth, managedUser }) {
                                                 </td>
                                                 <td className="px-8 py-6">
                                                     <span className="text-sm font-semibold text-gray-600 truncate max-w-[200px] inline-block">📍 {event.location}</span>
-                                                </td>
-                                                <td className="px-8 py-6 text-xs text-gray-500">
-                                                    <div>Start: <span className="font-bold text-[#0A1D37]">{event.race_start_time ? event.race_start_time.substring(0, 5) : '06:00'}</span></div>
-                                                    <div>Cut-off: <span className="font-bold text-[#0A1D37]">{event.cut_off_time ? event.cut_off_time.substring(0, 5) : '02:00'} hrs</span></div>
                                                 </td>
                                                 <td className="px-8 py-6">
                                                     <span className="font-bold text-gray-700">{event.max_participants || 'Unlimited'} pax</span>
