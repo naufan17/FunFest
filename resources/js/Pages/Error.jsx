@@ -3,34 +3,67 @@ import { Head, Link } from '@inertiajs/react';
 
 export default function Error({ status }) {
     const title = {
-        503: '503: Service Unavailable',
-        500: '500: Server Error',
-        404: '404: Page Not Found',
-        403: '403: Forbidden',
+        400: '400: Bad Request',
         401: '401: Unauthorized',
-        429: '429: Too Many Requests',
+        403: '403: Forbidden',
+        404: '404: Page Not Found',
         405: '405: Method Not Allowed',
-    }[status];
+        408: '408: Request Timeout',
+        409: '409: Conflict',
+        410: '410: Gone',
+        413: '413: Payload Too Large',
+        414: '414: URI Too Long',
+        415: '415: Unsupported Media Type',
+        419: '419: Page Expired',
+        429: '429: Too Many Requests',
+        500: '500: Server Error',
+        501: '501: Not Implemented',
+        502: '502: Bad Gateway',
+        503: '503: Service Unavailable',
+        504: '504: Gateway Timeout',
+    }[status] || 'Error';
 
     const description = {
-        503: 'Sorry, we are doing some maintenance. Please check back soon.',
-        500: 'Whoops, something went wrong on our servers. Our team is on the track fixing it!',
-        404: 'Sorry, the page you are looking for could not be found. Maybe it took a wrong turn?',
+        400: 'Oops! Your request was invalid. Please check your input and try again.',
+        401: 'Please log in to access this page. The race is waiting for you!',
         403: 'Sorry, you are forbidden from accessing this page. This area is for authorized personnel only.',
-        401: 'Please log in to access this page. The race is waiting!',
-        429: 'Whoa there, speedster! You are making too many requests. Catch your breath and try again.',
+        404: 'Sorry, the page you are looking for could not be found. Maybe it took a wrong turn?',
         405: 'Sorry, the method used for this request is not allowed. Did you take a shortcut?',
-    }[status];
+        408: 'Your request took too long to complete. Please try again.',
+        409: 'There is a conflict with the current state of the resource. Please try again.',
+        410: 'This resource no longer exists and will not be available again.',
+        413: 'Your request is too large. Please try with a smaller payload.',
+        414: 'The URI you provided is too long. Please shorten it and try again.',
+        415: 'The media type of your request is not supported. Please use a supported format.',
+        419: 'The page expired due to inactivity. Please refresh and try again.',
+        429: 'Whoa there, speedster! You are making too many requests. Catch your breath and try again.',
+        500: 'Whoops, something went wrong on our servers. Our team is working to fix it!',
+        501: 'This feature is not yet implemented. Check back soon!',
+        502: 'Bad gateway error. Please try again in a moment.',
+        503: 'Sorry, we are doing some maintenance. Please check back soon.',
+        504: 'The server took too long to respond. Please try again.',
+    }[status] || 'An error occurred. Please try again.';
 
     const icon = {
-        503: '🚧',
-        500: '💥',
-        404: '🏜️',
-        403: '🚫',
+        400: '🤔',
         401: '🔑',
-        429: '🛑',
+        403: '🚫',
+        404: '🏜️',
         405: '🚫',
-    }[status];
+        408: '⏱️',
+        409: '💥',
+        410: '🗑️',
+        413: '📦',
+        414: '🔗',
+        415: '📄',
+        419: '⏰',
+        429: '🛑',
+        500: '💥',
+        501: '🚀',
+        502: '🌉',
+        503: '🚧',
+        504: '⏳',
+    }[status] || '❌';
 
     return (
         <div className="min-h-screen bg-[#0A1D37] flex items-center justify-center px-6 py-12">
