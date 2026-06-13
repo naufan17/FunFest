@@ -73,6 +73,7 @@ class EventController extends Controller
         $event->load(['creator', 'categories']);
         
         $userId = auth()->id();
+        $userRole = auth()->user()?->role;
 
         $search = $request->input('search');
         $status = $request->input('status');
@@ -113,6 +114,21 @@ class EventController extends Controller
             ->orderBy('finish_time')
             ->limit(10)
             ->get();
+        $statistics = null;
+        if ($userRole === 'organizer' || ($userId && $event->created_by === $userId)) {
+            $statistics = [
+                'total' => $event->registrations()->count(),
+                'gender' => [
+                    'male' => $event->registrations()->where('gender', 'male')->count(),
+                    'female' => $event->registrations()->where('gender', 'female')->count(),
+                ],
+                'status' => [
+                    'registered' => $event->registrations()->where('status', 'registered')->count(),
+                    'checked_in' => $event->registrations()->where('status', 'checked_in')->count(),
+                    'finished' => $event->registrations()->where('status', 'finished')->count(),
+                ]
+            ];
+        }
         
         return Inertia::render('Events/Show', [
             'event' => $event,
@@ -129,6 +145,7 @@ class EventController extends Controller
             'isOwner' => $userId ? $event->created_by === $userId : false,
             'isRegistered' => $userId ? $event->registrations()->where('user_id', $userId)->exists() : false,
             'registration' => $userId ? $event->registrations()->where('user_id', $userId)->first() : null,
+            'statistics' => $statistics,
         ]);
     }
 

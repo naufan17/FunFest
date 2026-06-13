@@ -3,7 +3,18 @@ import { Link } from '@inertiajs/react';
 import Button from '@/Components/Button';
 
 export default function EventCard({ event }) {
-    const isIncoming = event.date >= new Date().toISOString().split('T')[0];
+    const today = new Date().toISOString().split('T')[0];
+    let statusText, statusColor;
+    if (event.date > today) {
+        statusText = 'Incoming';
+        statusColor = 'bg-green-500/90 shadow-green-500/20 text-white';
+    } else if (event.date === today) {
+        statusText = 'On Going';
+        statusColor = 'bg-blue-500/90 shadow-blue-500/20 text-white';
+    } else {
+        statusText = 'Closed';
+        statusColor = 'bg-red-500/90 shadow-red-500/20 text-white';
+    }
 
     return (
         <div className="group overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm transition-all hover:shadow-2xl hover:-translate-y-1">
@@ -19,15 +30,9 @@ export default function EventCard({ event }) {
                     <span className="rounded-full bg-white/90 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-[#0A1D37] backdrop-blur">
                         {event.distance}
                     </span>
-                    {isIncoming ? (
-                        <span className="rounded-full bg-green-500/90 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-white backdrop-blur shadow-lg shadow-green-500/20">
-                            Incoming
-                        </span>
-                    ) : (
-                        <span className="rounded-full bg-red-500/90 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-white backdrop-blur shadow-lg shadow-red-500/20">
-                            Outdated
-                        </span>
-                    )}
+                    <span className={`rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest backdrop-blur shadow-lg ${statusColor}`}>
+                        {statusText}
+                    </span>
                 </div>
             </div>
             <div className="p-8">

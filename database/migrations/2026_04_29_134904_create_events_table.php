@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('events', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->string('title');
             $table->text('description');
             $table->string('distance');
@@ -26,7 +26,7 @@ return new class extends Migration
             $table->string('organizer_name');
             $table->string('contact');
             $table->string('banner_url')->nullable();
-            $table->foreignId('created_by')->constrained('users');
+            $table->foreignUuid('created_by')->constrained('users');
             $table->timestamps();
         });
     }

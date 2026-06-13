@@ -4,6 +4,7 @@ import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import DatePicker from '@/Components/DatePicker';
+import TimePicker from '@/Components/TimePicker';
 import { Head, router } from '@inertiajs/react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -182,22 +183,28 @@ export default function Create() {
                                     <InputError message={errors.max_participants?.message || backendErrors.max_participants} className="mt-2" />
                                 </div>
                                 <div>
-                                    <InputLabel value="Race Start Time" />
-                                    <TextInput type="time" className="mt-1 block w-full" {...register('race_start_time')} />
-                                    <InputError message={errors.race_start_time?.message || backendErrors.race_start_time} className="mt-2" />
+                                    <TimePicker
+                                        label="Race Start Time"
+                                        value={watch('race_start_time') || ''}
+                                        onChange={(value) => setValue('race_start_time', value, { shouldValidate: true })}
+                                        error={errors.race_start_time?.message || backendErrors.race_start_time}
+                                    />
                                 </div>
                              </div>
                              <div>
-                                <InputLabel value="Cut-off Time" />
-                                <TextInput type="time" className="mt-1 block w-full" {...register('cut_off_time')} />
-                                <InputError message={errors.cut_off_time?.message || backendErrors.cut_off_time} className="mt-2" />
+                                <TimePicker
+                                    label="Cut-off Time"
+                                    value={watch('cut_off_time') || ''}
+                                    onChange={(value) => setValue('cut_off_time', value, { shouldValidate: true })}
+                                    error={errors.cut_off_time?.message || backendErrors.cut_off_time}
+                                />
                              </div>
                         </div>
 
                         {/* Registration Dates */}
                         <div className="space-y-6">
                             <h3 className="text-sm font-black uppercase tracking-widest text-[#FF5722]">Registration Window</h3>
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-rows-2 gap-4">
                                 <div>
                                     <DatePicker
                                         label="Registration Starts"

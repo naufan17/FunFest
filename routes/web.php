@@ -22,9 +22,6 @@ Route::get('/', function () {
     ]);
 });
 
-// Public Event Routes
-Route::resource('events', EventController::class)->only(['index', 'show']);
-
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/guide', function () {
@@ -52,5 +49,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/admin/users/{user}', [AdminUserController::class, 'destroy'])->name('admin.users.destroy');
     });
 });
+
+// Public Event Routes
+Route::resource('events', EventController::class)->only(['index', 'show']);
 
 require __DIR__.'/auth.php';

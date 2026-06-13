@@ -7,16 +7,26 @@ import LeaderboardTable from '@/Components/LeaderboardTable';
 
 import ResultInputModal from '@/Components/ResultInputModal';
 
-export default function Show({ auth, event, participants, leaderboard, isOwner, isRegistered, registration, filters }) {
+export default function Show({ auth, event, participants, leaderboard, isOwner, isRegistered, registration, filters, statistics }) {
     const isAdmin = auth.user?.role === 'admin';
     const [activeTab, setActiveTab] = useState('info'); // 'info', 'participants', 'leaderboard'
     const [resultModal, setResultModal] = useState({ show: false, regId: null });
 
-    const isOutdated = event.date < new Date().toISOString().split('T')[0];
+    const today = new Date().toISOString().split('T')[0];
+    const isOutdated = event.date < today;
+    const isRegistrationOpen = today >= event.registration_start && today <= event.registration_end;
+    const registrationStatusText = today < event.registration_start ? 'Opening Soon' : (today > event.registration_end ? 'Closed' : 'Open');
     const isFull = participants.total >= event.max_participants;
+    
+    const formatDate = (dateStr) => {
+        if (!dateStr) return '';
+        const [year, month, day] = dateStr.split('-');
+        const date = new Date(year, month - 1, day);
+        return date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
+    };
     const isParticipant = auth.user.role === 'participant';
 
-    const { data, setData, post: joinEvent, processing: joining, errors: joinErrors } = useForm({ gender: '' });
+    const { data, setData, post: joinEvent, processing: joining, errors: joinErrors, transform } = useForm({ gender: '' });
     const { patch: updateRegistration, processing: updating } = useForm({ status: '', finish_time: '' });
 
     const handleJoin = (gender) => {
@@ -25,9 +35,12 @@ export default function Show({ auth, event, participants, leaderboard, isOwner, 
             return; // Basic frontend validation
         }
 
+        transform((data) => ({
+            ...data,
+            gender: gender,
+        }));
+
         joinEvent(route('events.join', event.id), {
-            data: { gender }, // Note: useForm doesn't naturally merge this, but Inertia's router does.
-            onBefore: () => setData('gender', gender),
             preserveScroll: true
         });
     };
@@ -89,7 +102,7 @@ export default function Show({ auth, event, participants, leaderboard, isOwner, 
                 <div className="flex-1 space-y-12">
                     {/* Tabs */}
                     <div className="flex border-b border-gray-100">
-                        {['info', 'participants', 'leaderboard'].map(tab => (
+                        {['info', 'participants', 'leaderboard', ...(statistics ? ['statistics'] : [])].map(tab => (
                             <button
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
@@ -120,8 +133,21 @@ export default function Show({ auth, event, participants, leaderboard, isOwner, 
                                 <div className="rounded-2xl bg-gray-50 p-8">
                                     <h4 className="text-sm font-black uppercase tracking-widest text-[#FF5722] mb-4">Registration</h4>
                                     <ul className="space-y-4">
-                                        <li className="flex justify-between border-b border-gray-200 pb-2"><span className="text-gray-400">Status</span> <span className="font-bold text-green-600">Open</span></li>
-                                        <li className="flex justify-between border-b border-gray-200 pb-2"><span className="text-gray-400">Closing Date</span> <span className="font-bold">{event.registration_end}</span></li>
+                                        <li className="flex justify-between border-b border-gray-200 pb-2">
+                                            <span className="text-gray-400">Status</span> 
+                                            <span className={`font-bold ${isRegistrationOpen ? 'text-green-600' : 'text-orange-500'}`}>{registrationStatusText}</span>
+                                        </li>
+                                        {today < event.registration_start ? (
+                                            <li className="flex justify-between border-b border-gray-200 pb-2">
+                                                <span className="text-gray-400">Opening Date</span> 
+                                                <span className="font-bold">{formatDate(event.registration_start)}</span>
+                                            </li>
+                                        ) : (
+                                            <li className="flex justify-between border-b border-gray-200 pb-2">
+                                                <span className="text-gray-400">Closing Date</span> 
+                                                <span className="font-bold">{formatDate(event.registration_end)}</span>
+                                            </li>
+                                        )}
                                         <li className="flex justify-between border-b border-gray-200 pb-2"><span className="text-gray-400">Participants</span> <span className="font-bold">{participants.total} / {event.max_participants}</span></li>
                                     </ul>
                                 </div>
@@ -144,6 +170,46 @@ export default function Show({ auth, event, participants, leaderboard, isOwner, 
 
                     {activeTab === 'leaderboard' && (
                         <LeaderboardTable leaderboard={leaderboard} />
+                    )}
+
+                    {activeTab === 'statistics' && statistics && (
+                        <div className="space-y-6">
+                            <h3 className="text-xl font-black italic tracking-tight uppercase">Participant Statistics</h3>
+                            <div className="grid gap-6 md:grid-cols-3">
+                                <div className="rounded-2xl bg-gray-50 p-8 flex flex-col items-center justify-center text-center shadow-sm">
+                                    <h4 className="text-sm font-black uppercase tracking-widest text-gray-500 mb-2">Total Registrations</h4>
+                                    <p className="text-5xl font-black text-[#FF5722]">{statistics.total}</p>
+                                </div>
+                                <div className="rounded-2xl bg-gray-50 p-8 shadow-sm">
+                                    <h4 className="text-sm font-black uppercase tracking-widest text-gray-500 mb-4 text-center">By Gender</h4>
+                                    <div className="flex justify-between items-center mb-4">
+                                        <span className="text-gray-600 font-bold uppercase text-xs tracking-wider">Male ♂</span>
+                                        <span className="text-2xl font-black">{statistics.gender.male}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-gray-600 font-bold uppercase text-xs tracking-wider">Female ♀</span>
+                                        <span className="text-2xl font-black">{statistics.gender.female}</span>
+                                    </div>
+                                </div>
+                                <div className="rounded-2xl bg-gray-50 p-8 shadow-sm">
+                                    <h4 className="text-sm font-black uppercase tracking-widest text-gray-500 mb-4 text-center">By Status</h4>
+                                    <div className="space-y-3">
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-gray-600 font-bold uppercase text-xs tracking-wider">Registered</span>
+                                            <span className="text-xl font-black text-gray-700">{statistics.status.registered}</span>
+                                        </div>
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-gray-600 font-bold uppercase text-xs tracking-wider">Checked In</span>
+                                            <span className="text-xl font-black text-blue-600">{statistics.status.checked_in}</span>
+                                        </div>
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-gray-600 font-bold uppercase text-xs tracking-wider">Finished</span>
+                                            <span className="text-xl font-black text-green-600">{statistics.status.finished}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     )}
                 </div>
 
@@ -186,7 +252,7 @@ export default function Show({ auth, event, participants, leaderboard, isOwner, 
                                         {event.categories.map(cat => {
                                             const userGender = auth.user?.gender;
                                             const isGenderMismatch = userGender && userGender !== cat.gender;
-                                            const isDisabled = joining || isOutdated || isFull || isGenderMismatch;
+                                            const isDisabled = joining || isOutdated || isFull || isGenderMismatch || !isRegistrationOpen;
 
                                             return (
                                                 <div key={cat.id} className="relative">
@@ -194,12 +260,12 @@ export default function Show({ auth, event, participants, leaderboard, isOwner, 
                                                         onClick={() => {
                                                             if (!auth.user) {
                                                                 window.location.href = route('login');
-                                                            } else if (!isGenderMismatch) {
+                                                            } else if (!isDisabled) {
                                                                 handleJoin(cat.gender);
                                                             }
                                                         }}
                                                         disabled={isDisabled}
-                                                        variant={isOutdated || isFull || isGenderMismatch ? 'ghost' : 'white'}
+                                                        variant={isDisabled ? 'ghost' : 'white'}
                                                         className={`w-full py-4 text-lg transition-all ${isGenderMismatch ? 'opacity-40 cursor-not-allowed' : ''}`}
                                                     >
                                                         {cat.gender === 'male' ? '♂' : '♀'} JOIN AS {cat.gender.toUpperCase()}
@@ -218,6 +284,8 @@ export default function Show({ auth, event, participants, leaderboard, isOwner, 
                                     <div className="flex items-center gap-2 text-[10px] uppercase font-black tracking-widest text-gray-500">
                                         {isOutdated ? (
                                             <span className="text-red-400 text-[16px] font-semibold">Event is closed</span>
+                                        ) : !isRegistrationOpen ? (
+                                            <span className="text-orange-400 text-[16px] font-semibold">Registration {registrationStatusText}</span>
                                         ) : isFull ? (
                                             <span className="text-red-400 text-[16px] font-semibold">Event is full</span>
                                         ) : (

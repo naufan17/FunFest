@@ -13,13 +13,10 @@ return new class extends Migration
     {
         Schema::table('events', function (Blueprint $table) {
             $table->softDeletes();
-            $table->index('created_by');
         });
 
         Schema::table('registrations', function (Blueprint $table) {
             $table->softDeletes();
-            $table->index('event_id');
-            $table->index('user_id');
             $table->unique(['user_id', 'event_id']);
         });
     }
@@ -31,14 +28,11 @@ return new class extends Migration
     {
         Schema::table('events', function (Blueprint $table) {
             $table->dropSoftDeletes();
-            $table->dropIndex(['created_by']);
         });
 
         Schema::table('registrations', function (Blueprint $table) {
             $table->dropSoftDeletes();
             $table->dropUnique(['user_id', 'event_id']);
-            $table->dropIndex(['event_id']);
-            $table->dropIndex(['user_id']);
         });
     }
 };
