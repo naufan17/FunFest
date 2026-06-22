@@ -142,7 +142,8 @@ export default function Users({ auth, users, filters }) {
             </div>
 
             <div className="overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-2xl">
-                <table className="w-full text-left">
+                <div className="overflow-x-auto">
+                <table className="w-full text-left whitespace-nowrap md:whitespace-normal">
                     <thead className="bg-gray-50/50">
                         <tr>
                             <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-400">User Details</th>
@@ -227,6 +228,7 @@ export default function Users({ auth, users, filters }) {
                         )}
                     </tbody>
                 </table>
+                </div>
                 
                 {users.links && users.data.length > 0 && (
                     <div className="p-8 border-t border-gray-100 flex justify-center gap-2 flex-wrap">

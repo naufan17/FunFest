@@ -51,7 +51,7 @@ export default function ParticipantTable({ event, participants, filters, isOwner
     return (
         <div className="space-y-6">
             {/* Search and Filters Bar */}
-            <div className="flex flex-col md:flex-row md:items-center gap-4 bg-white p-6 rounded-3xl border border-gray-100/70 shadow-sm">
+            <div className="flex flex-col md:flex-row md:items-center gap-3 bg-white p-4 md:p-6 rounded-2xl md:rounded-3xl border border-gray-100/70 shadow-sm">
                 {/* Search Input */}
                 <div className="flex-1 relative">
                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">🔍</span>
@@ -107,25 +107,26 @@ export default function ParticipantTable({ event, participants, filters, isOwner
             </div>
 
             {/* Table Container */}
-            <div className="overflow-hidden rounded-3xl border border-gray-100 bg-white">
-                <table className="w-full text-left">
+            <div className="overflow-hidden rounded-2xl md:rounded-3xl border border-gray-100 bg-white">
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[600px] text-left">
                      <thead className="bg-gray-50/50">
                         <tr>
-                            <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Runner</th>
-                            <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Gender</th>
-                            {(isOwner || isAdmin) && <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Status</th>}
-                            <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Result</th>
-                            <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Place</th>
-                            {isOwner && <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-400 text-right">Actions</th>}
+                            <th className="px-3 py-3 md:px-6 md:py-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Runner</th>
+                            <th className="px-3 py-3 md:px-6 md:py-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Gender</th>
+                            {(isOwner || isAdmin) && <th className="px-3 py-3 md:px-6 md:py-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Status</th>}
+                            <th className="px-3 py-3 md:px-6 md:py-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Result</th>
+                            <th className="px-3 py-3 md:px-6 md:py-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Place</th>
+                            {isOwner && <th className="px-3 py-3 md:px-6 md:py-4 text-[10px] font-black uppercase tracking-widest text-gray-400 text-right">Actions</th>}
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-50">
                         {calculateRankings(participants.data).map(reg => (
                             <tr key={reg.id} className="hover:bg-gray-50/50 transition-colors">
-                                <td className="px-6 py-6 font-bold text-[#0A1D37]">{maskName(reg.user.name)}</td>
-                                <td className="px-6 py-6 text-sm text-gray-500 uppercase">{reg.gender}</td>
+                                <td className="px-3 py-3 md:px-6 md:py-4 font-bold text-[#0A1D37]">{maskName(reg.user.name)}</td>
+                                <td className="px-3 py-3 md:px-6 md:py-4 text-sm text-gray-500 uppercase">{reg.gender}</td>
                                 {(isOwner || isAdmin) && (
-                                    <td className="px-6 py-6">
+                                    <td className="px-3 py-3 md:px-6 md:py-4">
                                         <span className={`rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest ${
                                             reg.status === 'finished' ? 'bg-green-100 text-green-700' :
                                             reg.status === 'checked_in' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-[#FF5722]'
@@ -134,14 +135,14 @@ export default function ParticipantTable({ event, participants, filters, isOwner
                                         </span>
                                     </td>
                                 )}
-                                <td className="px-6 py-6 font-mono font-bold text-sm">
+                                <td className="px-3 py-3 md:px-6 md:py-4 font-mono font-bold text-sm">
                                     {reg.status === 'finished' ? (
                                         <span className="text-green-600 font-black">{reg.finish_time}</span>
                                     ) : (
                                         <span className="text-gray-300">--:--:--</span>
                                     )}
                                 </td>
-                                <td className="px-6 py-6">
+                                <td className="px-3 py-3 md:px-6 md:py-4">
                                     {reg.status === 'finished' ? (
                                         <span className="inline-flex items-center gap-2 text-sm font-black text-[#FF5722]">
                                             <span>{getRoleBadge(reg.ranking)}</span>
@@ -152,7 +153,7 @@ export default function ParticipantTable({ event, participants, filters, isOwner
                                     )}
                                 </td>
                                 {isOwner && (
-                                    <td className="px-6 py-6 text-right space-x-2">
+                                    <td className="px-3 py-3 md:px-6 md:py-4 text-right space-x-2">
                                         {reg.status === 'registered' && (
                                             <Button onClick={() => onStatusUpdate(reg.id, 'checked_in')} variant="ghost" size="sm">
                                                 Check-in
@@ -169,13 +170,14 @@ export default function ParticipantTable({ event, participants, filters, isOwner
                         ))}
                     </tbody>
                 </table>
+              </div>
                 
                 {participants.data.length === 0 && (
-                    <p className="p-12 text-center text-gray-400 italic">No registrations yet.</p>
+                    <p className="p-8 md:p-12 text-center text-gray-400 italic">No registrations yet.</p>
                 )}
 
                 {participants.links && participants.data.length > 0 && (
-                    <div className="border-t border-gray-50 bg-gray-50/30 p-6 flex justify-center gap-2">
+                    <div className="border-t border-gray-50 bg-gray-50/30 p-4 md:p-6 flex justify-center gap-1.5 md:gap-2 flex-wrap">
                         {participants.links.map((link, index) => (
                             <Link
                                 key={index}

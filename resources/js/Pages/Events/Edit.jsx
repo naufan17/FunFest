@@ -95,8 +95,8 @@ export default function Edit({ event }) {
             <Head title="Edit Event" />
 
             <div className="mx-auto max-w-4xl overflow-hidden rounded-[2.5rem] border border-gray-100 bg-white shadow-2xl">
-                <form onSubmit={handleSubmit(onSubmit)} className="p-8 md:p-12">
-                    <div className="grid gap-8 md:grid-cols-2">
+                <form onSubmit={handleSubmit(onSubmit)} className="p-6 md:p-12">
+                    <div className="grid gap-6 md:gap-8 grid-cols-1 md:grid-cols-2">
                         <div className="md:col-span-2">
                             <InputLabel value="Event Title" />
                             <TextInput id="title" className="mt-1 block w-full" {...register('title')} />

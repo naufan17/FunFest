@@ -13,7 +13,7 @@ export default function Edit({ mustVerifyEmail, status }) {
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
                         <h2 className="text-sm font-black uppercase tracking-[0.3em] text-[#FF5722]">Account Settings</h2>
-                        <h1 className="text-5xl font-black italic tracking-tighter text-[#0A1D37]">USER PROFILE</h1>
+                        <h1 className="text-3xl md:text-5xl font-black italic tracking-tighter text-[#0A1D37]">USER PROFILE</h1>
                     </div>
                     <div className="flex items-center gap-4 rounded-3xl bg-white p-4 shadow-sm border border-gray-100">
                         <div className="h-12 w-12 rounded-full bg-gradient-to-br from-[#0A1D37] to-[#1a3a63] flex items-center justify-center text-xl">👤</div>
@@ -28,18 +28,18 @@ export default function Edit({ mustVerifyEmail, status }) {
             <Head title="Profile" />
 
             <div className="space-y-10">
-                <section className="overflow-hidden rounded-[3rem] border border-gray-100 bg-white p-10 shadow-sm">
+                <section className="overflow-hidden rounded-2xl md:rounded-[3rem] border border-gray-100 bg-white p-6 md:p-10 shadow-sm">
                     <UpdateProfileInformationForm
                         mustVerifyEmail={mustVerifyEmail}
                         status={status}
                     />
                 </section>
 
-                <section className="overflow-hidden rounded-[3rem] border border-gray-100 bg-white p-10 shadow-sm">
+                <section className="overflow-hidden rounded-2xl md:rounded-[3rem] border border-gray-100 bg-white p-6 md:p-10 shadow-sm">
                     <UpdatePasswordForm />
                 </section>
 
-                <section className="overflow-hidden rounded-[3rem] border border-red-50 bg-red-50/30 p-10 shadow-sm">
+                <section className="overflow-hidden rounded-2xl md:rounded-[3rem] border border-red-50 bg-red-50/30 p-6 md:p-10 shadow-sm">
                     <DeleteUserForm />
                 </section>
             </div>

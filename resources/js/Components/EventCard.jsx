@@ -17,8 +17,8 @@ export default function EventCard({ event }) {
     }
 
     return (
-        <div className="group overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm transition-all hover:shadow-2xl hover:-translate-y-1">
-            <div className="relative h-48 bg-gray-200">
+        <div className="group overflow-hidden rounded-2xl md:rounded-3xl border border-gray-100 bg-white shadow-sm transition-all hover:shadow-2xl hover:-translate-y-1">
+            <div className="relative h-36 md:h-48 bg-gray-200">
                 {event.banner_url ? (
                     <img src={event.banner_url} className="h-full w-full object-cover" alt={event.title} />
                 ) : (
@@ -26,7 +26,7 @@ export default function EventCard({ event }) {
                         <span className="text-4xl">🏃</span>
                     </div>
                 )}
-                <div className="absolute top-4 left-4 flex gap-2">
+                <div className="absolute top-3 left-3 md:top-4 md:left-4 flex gap-1.5 md:gap-2">
                     <span className="rounded-full bg-white/90 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-[#0A1D37] backdrop-blur">
                         {event.distance}
                     </span>
@@ -35,16 +35,16 @@ export default function EventCard({ event }) {
                     </span>
                 </div>
             </div>
-            <div className="p-8">
-                <div className="mb-4 flex items-center justify-between text-xs font-bold text-gray-400">
+            <div className="p-5 md:p-8">
+                <div className="mb-3 md:mb-4 flex items-center justify-between text-[10px] md:text-xs font-bold text-gray-400">
                     <span>📅 {event.date}</span>
                     <span>📍 {event.location}</span>
                 </div>
-                <h3 className="mb-4 text-xl font-black italic tracking-tight text-[#0A1D37] group-hover:text-[#FF5722] transition-colors">
+                <h3 className="mb-3 md:mb-4 text-base md:text-xl font-black italic tracking-tight text-[#0A1D37] group-hover:text-[#FF5722] transition-colors">
                     {event.title}
                 </h3>
-                <div className="mb-8 flex items-center justify-between">
-                    <div className="flex -space-x-2">
+                <div className="mb-5 md:mb-8 flex items-center justify-between">
+                    <div className="flex -space-x-1.5 md:-space-x-2">
                         {[...Array(3)].map((_, i) => (
                             <div key={i} className="h-8 w-8 rounded-full border-2 border-white bg-gray-100 flex items-center justify-center text-[10px]">👤</div>
                         ))}

@@ -9,13 +9,13 @@ export default function Guide({ auth }) {
 
             <div className="max-w-4xl mx-auto space-y-12 pb-12">
                 {/* Hero Section */}
-                <div className="relative overflow-hidden rounded-[3rem] bg-gradient-to-r from-[#0A1D37] to-[#1a3a63] p-12 md:p-16 text-white shadow-2xl">
+                <div className="relative overflow-hidden rounded-[3rem] bg-gradient-to-r from-[#0A1D37] to-[#1a3a63] p-8 md:p-16 text-white shadow-2xl">
                     <div className="relative z-10">
                         <Link href={route('dashboard')} className="text-xs font-black uppercase tracking-[0.2em] text-[#FF5722] hover:text-white transition-colors mb-6 inline-block">
                             ← BACK TO DASHBOARD
                         </Link>
                         <h2 className="text-sm font-black uppercase tracking-[0.3em] text-gray-300 mt-2">Management Tips</h2>
-                        <h1 className="mt-4 text-5xl md:text-6xl font-black italic tracking-tighter leading-tight">ENGAGE YOUR <br className="hidden md:block"/>COMMUNITY</h1>
+                        <h1 className="mt-4 text-4xl sm:text-5xl md:text-6xl font-black italic tracking-tighter leading-tight">ENGAGE YOUR <br className="hidden md:block"/>COMMUNITY</h1>
                         <p className="mt-6 text-lg text-gray-300 leading-relaxed max-w-2xl">
                             A great race isn't just about the finish line; it's about the journey and the community you build along the way.
                         </p>
@@ -26,7 +26,7 @@ export default function Guide({ auth }) {
                 {/* Content Section */}
                 <div className="grid gap-8">
                     {/* Tip 1 */}
-                    <div className="rounded-[2.5rem] border border-gray-100 bg-white p-10 md:p-12 shadow-sm transition-all hover:shadow-xl relative overflow-hidden group">
+                    <div className="rounded-[2.5rem] border border-gray-100 bg-white p-8 md:p-12 shadow-sm transition-all hover:shadow-xl relative overflow-hidden group">
                         <div className="absolute -right-4 -top-4 flex h-32 w-32 items-center justify-center rounded-full bg-orange-50 text-6xl opacity-20 transition-transform group-hover:scale-110">
                             📣
                         </div>
@@ -39,7 +39,7 @@ export default function Guide({ auth }) {
                     </div>
 
                     {/* Tip 2 */}
-                    <div className="rounded-[2.5rem] border border-gray-100 bg-white p-10 md:p-12 shadow-sm transition-all hover:shadow-xl relative overflow-hidden group">
+                    <div className="rounded-[2.5rem] border border-gray-100 bg-white p-8 md:p-12 shadow-sm transition-all hover:shadow-xl relative overflow-hidden group">
                         <div className="absolute -right-4 -top-4 flex h-32 w-32 items-center justify-center rounded-full bg-blue-50 text-6xl opacity-20 transition-transform group-hover:scale-110">
                             📱
                         </div>
@@ -52,7 +52,7 @@ export default function Guide({ auth }) {
                     </div>
 
                     {/* Tip 3 */}
-                    <div className="rounded-[2.5rem] border border-gray-100 bg-white p-10 md:p-12 shadow-sm transition-all hover:shadow-xl relative overflow-hidden group">
+                    <div className="rounded-[2.5rem] border border-gray-100 bg-white p-8 md:p-12 shadow-sm transition-all hover:shadow-xl relative overflow-hidden group">
                         <div className="absolute -right-4 -top-4 flex h-32 w-32 items-center justify-center rounded-full bg-green-50 text-6xl opacity-20 transition-transform group-hover:scale-110">
                             🏅
                         </div>

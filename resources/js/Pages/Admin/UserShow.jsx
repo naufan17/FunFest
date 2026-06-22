@@ -132,7 +132,7 @@ export default function UserShow({ auth, managedUser }) {
                 </div>
 
                 {/* Tabs bar */}
-                <div className="bg-white rounded-3xl p-3 border border-gray-100 shadow-lg flex gap-2 w-max max-w-full">
+                <div className="bg-white rounded-3xl p-3 border border-gray-100 shadow-lg flex gap-2 w-full overflow-x-auto whitespace-nowrap">
                     <button
                         onClick={() => setActiveTab('profile')}
                         className={`px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-wider transition-all duration-300 ${
@@ -162,7 +162,7 @@ export default function UserShow({ auth, managedUser }) {
                                     : 'text-gray-500 hover:text-[#FF5722] hover:bg-gray-50'
                             }`}
                         >
-                            Organised Events ({organizedEvents})
+                            Organized Events ({organizedEvents})
                         </button>
                     )}
                 </div>
@@ -206,7 +206,8 @@ export default function UserShow({ auth, managedUser }) {
                     {activeTab === 'joined' && (
                         <div>
                             {totalJoined > 0 ? (
-                                <table className="w-full text-left border-collapse">
+                                <div className="overflow-x-auto">
+                                <table className="w-full text-left border-collapse whitespace-nowrap md:whitespace-normal">
                                     <thead className="bg-gray-50/50 border-b border-gray-100">
                                         <tr>
                                             <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-gray-400">Event Title</th>
@@ -260,6 +261,7 @@ export default function UserShow({ auth, managedUser }) {
                                         ))}
                                     </tbody>
                                 </table>
+                                </div>
                             ) : (
                                 <div className="p-16 flex flex-col items-center justify-center">
                                     <svg className="w-16 h-16 text-gray-200 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -275,50 +277,52 @@ export default function UserShow({ auth, managedUser }) {
                     {activeTab === 'created' && isPrivileged && (
                         <div>
                             {organizedEvents > 0 ? (
-                                <table className="w-full text-left border-collapse">
-                                    <thead className="bg-gray-50/50 border-b border-gray-100">
-                                        <tr>
-                                            <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-gray-400">Event Details</th>
-                                            <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-gray-400">Distance</th>
-                                            <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-gray-400">Location</th>
-                                            <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-gray-400">Max Participants</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-gray-50">
-                                        {managedUser.created_events.map((event) => (
-                                            <tr key={event.id} className="hover:bg-gray-50/50 transition-colors">
-                                                <td className="px-8 py-6">
-                                                    <div className="flex items-center gap-4">
-                                                        {event.banner_url ? (
-                                                            <img 
-                                                                src={`/storage/${event.banner_url}`} 
-                                                                alt="" 
-                                                                className="h-10 w-16 object-cover rounded-lg shadow-sm border border-gray-100"
-                                                            />
-                                                        ) : (
-                                                            <div className="h-10 w-16 rounded-lg bg-gray-100 flex items-center justify-center text-gray-400 text-xs font-bold border border-gray-100">
-                                                                No Banner
-                                                            </div>
-                                                        )}
-                                                        <div>
-                                                            <p className="font-black italic text-base text-[#0A1D37] leading-tight">{event.title}</p>
-                                                            <p className="text-xs text-gray-400 font-semibold">{new Date(event.date).toLocaleDateString()}</p>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td className="px-8 py-6">
-                                                    <span className="font-bold text-[#0A1D37]">{event.distance} KM</span>
-                                                </td>
-                                                <td className="px-8 py-6">
-                                                    <span className="text-sm font-semibold text-gray-600 truncate max-w-[200px] inline-block">📍 {event.location}</span>
-                                                </td>
-                                                <td className="px-8 py-6">
-                                                    <span className="font-bold text-gray-700">{event.max_participants || 'Unlimited'} pax</span>
-                                                </td>
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-left border-collapse whitespace-nowrap md:whitespace-normal">
+                                        <thead className="bg-gray-50/50 border-b border-gray-100">
+                                            <tr>
+                                                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-gray-400">Event Details</th>
+                                                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-gray-400">Distance</th>
+                                                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-gray-400">Location</th>
+                                                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-gray-400">Max Participants</th>
                                             </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
+                                        </thead>
+                                        <tbody className="divide-y divide-gray-50">
+                                            {managedUser.created_events.map((event) => (
+                                                <tr key={event.id} className="hover:bg-gray-50/50 transition-colors">
+                                                    <td className="px-8 py-6">
+                                                        <div className="flex items-center gap-4">
+                                                            {event.banner_url ? (
+                                                                <img 
+                                                                    src={`/storage/${event.banner_url}`} 
+                                                                    alt="" 
+                                                                    className="h-10 w-16 object-cover rounded-lg shadow-sm border border-gray-100"
+                                                                />
+                                                            ) : (
+                                                                <div className="h-10 w-16 rounded-lg bg-gray-100 flex items-center justify-center text-gray-400 text-xs font-bold border border-gray-100">
+                                                                    No Banner
+                                                                </div>
+                                                            )}
+                                                            <div>
+                                                                <p className="font-black italic text-base text-[#0A1D37] leading-tight">{event.title}</p>
+                                                                <p className="text-xs text-gray-400 font-semibold">{new Date(event.date).toLocaleDateString()}</p>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-8 py-6">
+                                                        <span className="font-bold text-[#0A1D37]">{event.distance} KM</span>
+                                                    </td>
+                                                    <td className="px-8 py-6">
+                                                        <span className="text-sm font-semibold text-gray-600 truncate max-w-[200px] inline-block">📍 {event.location}</span>
+                                                    </td>
+                                                    <td className="px-8 py-6">
+                                                        <span className="font-bold text-gray-700">{event.max_participants || 'Unlimited'} pax</span>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
                             ) : (
                                 <div className="p-16 flex flex-col items-center justify-center">
                                     <svg className="w-16 h-16 text-gray-200 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

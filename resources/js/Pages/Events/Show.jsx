@@ -65,7 +65,7 @@ export default function Show({ auth, event, participants, leaderboard, isOwner, 
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="flex flex-col md:flex-row md:items-start lg:items-center justify-between gap-4">
                     <div>
                         <div className="flex items-center gap-4 mb-2">
                             <span className="rounded-full bg-orange-100 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-[#FF5722]">
@@ -82,12 +82,12 @@ export default function Show({ auth, event, participants, leaderboard, isOwner, 
                             )}
                             <span className="text-xs font-bold text-gray-400">📅 {event.date}</span>
                         </div>
-                        <h2 className="text-4xl font-black italic tracking-tight text-[#0A1D37] leading-none">{event.title}</h2>
+                        <h2 className="text-3xl md:text-4xl lg:text-5xl font-black italic tracking-tight text-[#0A1D37] leading-none">{event.title}</h2>
                     </div>
 
                     {isOwner && (
                         <div className="flex gap-2">
-                            <Button as={Link} href={route('events.edit', event.id)} variant="white" size="lg">
+                            <Button as={Link} href={route('events.edit', event.id)} variant="white" size="md" className="w-full md:w-auto">
                                 Edit Event
                             </Button>
                         </div>
@@ -101,12 +101,12 @@ export default function Show({ auth, event, participants, leaderboard, isOwner, 
                 {/* Main Content */}
                 <div className="flex-1 space-y-12">
                     {/* Tabs */}
-                    <div className="flex border-b border-gray-100">
+                    <div className="flex border-b border-gray-100 overflow-x-auto whitespace-nowrap">
                         {['info', 'participants', 'leaderboard', ...(statistics ? ['statistics'] : [])].map(tab => (
                             <button
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
-                                className={`px-8 py-4 text-xs font-black uppercase tracking-widest transition-all ${activeTab === tab ? 'border-b-2 border-[#FF5722] text-[#FF5722]' : 'text-gray-400 hover:text-gray-600'
+                                className={`px-4 py-3 md:px-8 md:py-4 text-[10px] md:text-xs font-black uppercase tracking-widest transition-all ${activeTab === tab ? 'border-b-2 border-[#FF5722] text-[#FF5722]' : 'text-gray-400 hover:text-gray-600'
                                     }`}
                             >
                                 {tab}
@@ -115,14 +115,14 @@ export default function Show({ auth, event, participants, leaderboard, isOwner, 
                     </div>
 
                     {activeTab === 'info' && (
-                        <div className="space-y-12">
+                        <div className="space-y-8 md:space-y-12">
                             <div className="prose prose-slate max-w-none">
-                                <h3 className="text-xl font-black italic tracking-tight uppercase">About the Race</h3>
-                                <p className="text-gray-500 leading-relaxed text-lg">{event.description}</p>
+                                <h3 className="text-lg md:text-xl font-black italic tracking-tight uppercase">About the Race</h3>
+                                <p className="text-gray-500 leading-relaxed text-base md:text-lg">{event.description}</p>
                             </div>
 
                             <div className="grid gap-6 md:grid-cols-2">
-                                <div className="rounded-2xl bg-gray-50 p-8">
+                                <div className="rounded-2xl bg-gray-50 p-6 md:p-8">
                                     <h4 className="text-sm font-black uppercase tracking-widest text-[#FF5722] mb-4">Event Logistics</h4>
                                     <ul className="space-y-4">
                                         <li className="flex justify-between border-b border-gray-200 pb-2"><span className="text-gray-400">Location</span> <span className="font-bold">{event.location}</span></li>
@@ -130,7 +130,7 @@ export default function Show({ auth, event, participants, leaderboard, isOwner, 
                                         <li className="flex justify-between border-b border-gray-200 pb-2"><span className="text-gray-400">Cut-off</span> <span className="font-bold">{event.cut_off_time}</span></li>
                                     </ul>
                                 </div>
-                                <div className="rounded-2xl bg-gray-50 p-8">
+                                <div className="rounded-2xl bg-gray-50 p-6 md:p-8">
                                     <h4 className="text-sm font-black uppercase tracking-widest text-[#FF5722] mb-4">Registration</h4>
                                     <ul className="space-y-4">
                                         <li className="flex justify-between border-b border-gray-200 pb-2">
@@ -176,12 +176,12 @@ export default function Show({ auth, event, participants, leaderboard, isOwner, 
                         <div className="space-y-6">
                             <h3 className="text-xl font-black italic tracking-tight uppercase">Participant Statistics</h3>
                             <div className="grid gap-6 md:grid-cols-3">
-                                <div className="rounded-2xl bg-gray-50 p-8 flex flex-col items-center justify-center text-center shadow-sm">
-                                    <h4 className="text-sm font-black uppercase tracking-widest text-gray-500 mb-2">Total Registrations</h4>
-                                    <p className="text-5xl font-black text-[#FF5722]">{statistics.total}</p>
+                                <div className="rounded-2xl bg-gray-50 p-6 md:p-8 flex flex-col items-center justify-center text-center shadow-sm">
+                                    <h4 className="text-[10px] md:text-sm font-black uppercase tracking-widest text-gray-500 mb-2">Total Registrations</h4>
+                                    <p className="text-4xl md:text-5xl font-black text-[#FF5722]">{statistics.total}</p>
                                 </div>
-                                <div className="rounded-2xl bg-gray-50 p-8 shadow-sm">
-                                    <h4 className="text-sm font-black uppercase tracking-widest text-gray-500 mb-4 text-center">By Gender</h4>
+                                <div className="rounded-2xl bg-gray-50 p-6 md:p-8 shadow-sm">
+                                    <h4 className="text-[10px] md:text-sm font-black uppercase tracking-widest text-gray-500 mb-4 text-center">By Gender</h4>
                                     <div className="flex justify-between items-center mb-4">
                                         <span className="text-gray-600 font-bold uppercase text-xs tracking-wider">Male ♂</span>
                                         <span className="text-2xl font-black">{statistics.gender.male}</span>
@@ -191,8 +191,8 @@ export default function Show({ auth, event, participants, leaderboard, isOwner, 
                                         <span className="text-2xl font-black">{statistics.gender.female}</span>
                                     </div>
                                 </div>
-                                <div className="rounded-2xl bg-gray-50 p-8 shadow-sm">
-                                    <h4 className="text-sm font-black uppercase tracking-widest text-gray-500 mb-4 text-center">By Status</h4>
+                                <div className="rounded-2xl bg-gray-50 p-6 md:p-8 shadow-sm">
+                                    <h4 className="text-[10px] md:text-sm font-black uppercase tracking-widest text-gray-500 mb-4 text-center">By Status</h4>
                                     <div className="space-y-3">
                                         <div className="flex justify-between items-center">
                                             <span className="text-gray-600 font-bold uppercase text-xs tracking-wider">Registered</span>
@@ -216,7 +216,7 @@ export default function Show({ auth, event, participants, leaderboard, isOwner, 
                 {/* Sidebar: Registration Card */}
                 {!isOwner && !isAdmin && isParticipant && (
                     <div className="w-full lg:w-96">
-                        <div className="sticky top-24 overflow-hidden rounded-[2.5rem] bg-[#0A1D37] p-8 text-white shadow-2xl">
+                        <div className="sticky top-24 overflow-hidden rounded-[2.5rem] bg-[#0A1D37] p-6 md:p-8 text-white shadow-2xl">
                             {isRegistered ? (
                                 <div className="space-y-8 text-center">
                                     <div>

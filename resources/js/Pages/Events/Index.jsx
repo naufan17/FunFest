@@ -50,7 +50,7 @@ export default function Index({ auth, events, filters, distances }) {
             header={
                 <div className="flex items-center justify-start">
                     <div>
-                        <h2 className="text-3xl font-black italic tracking-tight text-[#0A1D37]">ALL EVENTS</h2>
+                        <h2 className="text-2xl md:text-3xl font-black italic tracking-tight text-[#0A1D37]">ALL EVENTS</h2>
                         <p className="text-gray-500 mt-1">Discover your next challenge</p>
                     </div>
                 </div>
@@ -59,7 +59,7 @@ export default function Index({ auth, events, filters, distances }) {
             <Head title="Events" />
 
             {/* Search and Filters Bar */}
-            <div className="flex flex-col md:flex-row md:items-center gap-4 bg-white p-6 rounded-3xl border border-gray-100/70 shadow-sm mb-8">
+            <div className="flex flex-col md:flex-row md:items-center gap-3 bg-white p-4 md:p-6 rounded-2xl md:rounded-3xl border border-gray-100/70 shadow-sm mb-6 md:mb-8">
                 {/* Search Input */}
                 <div className="flex-1 relative">
                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">🔍</span>
@@ -103,21 +103,21 @@ export default function Index({ auth, events, filters, distances }) {
                 </div>
             </div>
 
-            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-4 md:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                 {events.data.map((e) => (
                     <EventCard key={e.id} event={e} />
                 ))}
             </div>
 
             {events.data.length === 0 && (
-                <div className="py-24 text-center">
-                    <p className="text-2xl font-black italic text-gray-300">NO EVENTS FOUND</p>
+                <div className="py-16 md:py-24 text-center">
+                    <p className="text-xl md:text-2xl font-black italic text-gray-300">NO EVENTS FOUND</p>
                     <p className="text-gray-400 mt-2">Be the first to host one!</p>
                 </div>
             )}
 
             {events.links && events.data.length > 0 && (
-                <div className="mt-12 flex justify-center gap-2">
+                <div className="mt-8 md:mt-12 flex justify-center gap-1.5 md:gap-2 flex-wrap">
                     {events.links.map((link, index) => (
                         <Link
                             key={index}

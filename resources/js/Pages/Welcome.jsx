@@ -123,7 +123,7 @@ export default function Welcome({ auth, upcomingEvents }) {
                         <div className="mb-6 inline-block rounded-full bg-[#FF5722] px-4 py-1 text-xs font-bold uppercase tracking-widest">
                             Limited slots for Summer Marathon!
                         </div>
-                        <h1 className="mb-6 text-5xl font-black italic tracking-tight md:text-8xl">
+                        <h1 className="mb-4 md:mb-6 text-4xl sm:text-5xl md:text-8xl font-black italic tracking-tight">
                             JOIN THE RACE,<br />
                             <span className="text-[#FF5722]">FEEL THE FEST</span>
                         </h1>
@@ -206,7 +206,7 @@ export default function Welcome({ auth, upcomingEvents }) {
                             <h2 className="mb-4 text-4xl font-black italic text-[#0A1D37]">BEYOND THE FINISH LINE</h2>
                             <p className="text-gray-500">Everything you need to organize and conquer race day.</p>
                         </div>
-                        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+                        <div className="grid gap-6 md:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
                             {[
                                 {
                                     title: "Event Management",
@@ -277,7 +277,7 @@ export default function Welcome({ auth, upcomingEvents }) {
                 <section className="bg-[#0A1D37] py-24 text-white overflow-hidden relative" id="about">
                     <div className="absolute top-0 right-0 w-1/3 h-full bg-[#FF5722]/5 -skew-x-12 translate-x-1/2"></div>
                     <div className="mx-auto max-w-7xl px-6 relative z-10">
-                        <div className="grid gap-16 lg:grid-cols-2">
+                        <div className="grid gap-8 lg:gap-16 lg:grid-cols-2">
                             <div>
                                 <h2 className="mb-12 text-4xl font-black italic">WHO IS IT FOR?</h2>
                                 <div className="space-y-8">
@@ -322,8 +322,8 @@ export default function Welcome({ auth, upcomingEvents }) {
                 {/* CTA Section */}
                 <section className="py-24">
                     <div className="mx-auto max-w-5xl px-6 text-center">
-                        <div className="rounded-[3rem] bg-gradient-to-br from-[#FF5722] to-[#e64a19] px-6 py-20 text-white shadow-2xl">
-                            <h2 className="mb-6 text-4xl font-black italic md:text-6xl">READY TO RUN?</h2>
+                        <div className="rounded-3xl md:rounded-[3rem] bg-gradient-to-br from-[#FF5722] to-[#e64a19] px-6 py-12 md:py-20 text-white shadow-2xl">
+                            <h2 className="mb-4 md:mb-6 text-3xl sm:text-4xl md:text-6xl font-black italic">READY TO RUN?</h2>
                             <p className="mx-auto mb-10 max-w-xl text-lg text-orange-100">
                                 Join thousands of runners today. Register for your first event or start organizing your own.
                             </p>

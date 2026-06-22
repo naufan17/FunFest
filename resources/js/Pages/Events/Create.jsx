@@ -107,8 +107,8 @@ export default function Create() {
             <Head title="Create Event" />
 
             <div className="mx-auto max-w-4xl overflow-hidden rounded-[2.5rem] border border-gray-100 bg-white shadow-2xl">
-                <form onSubmit={handleSubmit(onSubmit)} className="p-8 md:p-12">
-                    <div className="grid gap-8 md:grid-cols-2">
+                <form onSubmit={handleSubmit(onSubmit)} className="p-6 md:p-12">
+                    <div className="grid gap-6 md:gap-8 grid-cols-1 md:grid-cols-2">
                         {/* Basic Info */}
                         <div className="space-y-6 md:col-span-2">
                             <h3 className="text-sm font-black uppercase tracking-widest text-[#FF5722]">General Information</h3>
@@ -176,7 +176,7 @@ export default function Create() {
 
                         <div className="space-y-6">
                              <h3 className="text-sm font-black uppercase tracking-widest text-[#FF5722]">Timing & Limits</h3>
-                             <div className="grid grid-cols-2 gap-4">
+                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <InputLabel value="Max Participants" />
                                     <TextInput type="number" className="mt-1 block w-full" {...register('max_participants')} />
@@ -204,7 +204,7 @@ export default function Create() {
                         {/* Registration Dates */}
                         <div className="space-y-6">
                             <h3 className="text-sm font-black uppercase tracking-widest text-[#FF5722]">Registration Window</h3>
-                            <div className="grid grid-rows-2 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <DatePicker
                                         label="Registration Starts"
@@ -251,7 +251,7 @@ export default function Create() {
                         {/* Contact */}
                         <div className="space-y-6 md:col-span-2">
                              <h3 className="text-sm font-black uppercase tracking-widest text-[#FF5722]">Organizer Details</h3>
-                             <div className="grid grid-cols-2 gap-4">
+                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <InputLabel value="Organizer Name" />
                                     <TextInput className="mt-1 block w-full" {...register('organizer_name')} />
