@@ -37,7 +37,8 @@ class EventController extends Controller
             ->when($distance, function ($query, $distance) {
                 $query->where('distance', $distance);
             })
-            ->latest()
+            ->orderByRaw("CASE WHEN date >= CURDATE() THEN 0 ELSE 1 END")
+            ->orderBy('date', 'asc')
             ->paginate(12)
             ->withQueryString();
 
@@ -145,6 +146,7 @@ class EventController extends Controller
             'isOwner' => $userId ? $event->created_by === $userId : false,
             'isRegistered' => $userId ? $event->registrations()->where('user_id', $userId)->exists() : false,
             'registration' => $userId ? $event->registrations()->where('user_id', $userId)->first() : null,
+            'registration_position' => $this->getRegistrationPosition($event, $userId),
             'statistics' => $statistics,
         ]);
     }
@@ -171,5 +173,30 @@ class EventController extends Controller
         $this->eventService->delete($event);
 
         return redirect()->route('events.index')->with('success', 'Event deleted successfully.');
+    }
+
+    private function getRegistrationPosition(Event $event, $userId): ?int
+    {
+        if (!$userId) {
+            return null;
+        }
+
+        $registration = $event->registrations()
+            ->where('user_id', $userId)
+            ->where('status', 'finished')
+            ->first();
+
+        if (!$registration || !$registration->finish_time) {
+            return null;
+        }
+
+        // Count how many finished registrations of the same gender have a faster time
+        $position = $event->registrations()
+            ->where('gender', $registration->gender)
+            ->where('status', 'finished')
+            ->where('finish_time', '<', $registration->finish_time)
+            ->count();
+
+        return $position + 1; // 1-based rank
     }
 }

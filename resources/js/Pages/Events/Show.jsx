@@ -7,7 +7,7 @@ import LeaderboardTable from '@/Components/LeaderboardTable';
 
 import ResultInputModal from '@/Components/ResultInputModal';
 
-export default function Show({ auth, event, participants, leaderboard, isOwner, isRegistered, registration, filters, statistics }) {
+export default function Show({ auth, event, participants, leaderboard, isOwner, isRegistered, registration, registration_position, filters, statistics }) {
     const isAdmin = auth.user?.role === 'admin';
     const [activeTab, setActiveTab] = useState('info'); // 'info', 'participants', 'leaderboard'
     const [resultModal, setResultModal] = useState({ show: false, regId: null });
@@ -228,10 +228,32 @@ export default function Show({ auth, event, participants, leaderboard, isOwner, 
                                         <p className="text-2xl font-black italic uppercase text-white">{registration.status.replace('_', ' ')}</p>
                                     </div>
                                     {registration.status === 'finished' && (
-                                        <div className="rounded-2xl bg-[#FF5722] p-6 shadow-xl shadow-orange-500/20">
-                                            <p className="text-xs uppercase font-black tracking-widest text-orange-200 mb-2">Official Time</p>
-                                            <p className="text-3xl font-black italic text-white">{registration.finish_time}</p>
-                                        </div>
+                                        <>
+                                            {registration_position && (
+                                                <div className="rounded-2xl bg-white/5 p-6 border border-white/10">
+                                                    <p className="text-xs uppercase font-black tracking-widest text-gray-500 mb-2">Position ({registration.gender})</p>
+                                                    <div className="flex items-center justify-center gap-3">
+                                                        <span className={`text-4xl font-black italic ${
+                                                            registration_position === 1 ? 'text-yellow-400' :
+                                                            registration_position === 2 ? 'text-gray-300' :
+                                                            registration_position === 3 ? 'text-amber-600' :
+                                                            'text-white'
+                                                        }`}>
+                                                            #{registration_position}
+                                                        </span>
+                                                        {registration_position <= 3 && (
+                                                            <span className="text-2xl">
+                                                                {registration_position === 1 ? '🥇' : registration_position === 2 ? '🥈' : '🥉'}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            )}
+                                            <div className="rounded-2xl bg-[#FF5722] p-6 shadow-xl shadow-orange-500/20">
+                                                <p className="text-xs uppercase font-black tracking-widest text-orange-200 mb-2">Official Time</p>
+                                                <p className="text-3xl font-black italic text-white">{registration.finish_time}</p>
+                                            </div>
+                                        </>
                                     )}
                                     <div className="text-xs text-gray-500 leading-relaxed">
                                         Show your profile at the check-in desk on race day to receive your race pack.
